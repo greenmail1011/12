@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#315b4c">
 <title>彌勒山12人小組勤務安排</title>
+
+<!-- Google Visualization Query：直接讀取已「發布到網路」的 Google 試算表 -->
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
 <style>
 :root{
   --bg:#f4f6f3;--ink:#25312c;--muted:#748078;--line:#d8dfdb;
@@ -20,7 +24,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Pin
 .notice{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:9px;min-height:46px;padding:0 12px;background:var(--warn-bg);border-bottom:1px solid var(--warn-line);color:var(--warn-ink)}
 .notice-icon{font-size:18px;flex:0 0 auto}
 .notice-window{position:relative;height:28px;flex:1;overflow:hidden}
-.notice-item{position:absolute;inset:0;display:flex;align-items:center;font-size:14px;line-height:1.3;font-weight:800;opacity:0;transform:translateY(110%);transition:transform .55s ease,opacity .42s ease;will-change:transform,opacity}
+.notice-item{position:absolute;inset:0;display:flex;align-items:center;font-size:14px;line-height:1.3;font-weight:800;opacity:0;transform:translateY(110%);transition:transform .55s ease,opacity .42s ease}
 .notice-item.show{opacity:1;transform:translateY(0)}
 .notice-item.out{opacity:0;transform:translateY(-110%)}
 
@@ -30,14 +34,12 @@ h1{margin:0;font-size:clamp(24px,4vw,36px);line-height:1.2}
 .sub{margin-top:6px;font-size:14px;opacity:.92}
 .sync{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;opacity:.86}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#a6e4bd;box-shadow:0 0 0 3px rgba(166,228,189,.14)}
-
 .wrap{max-width:1500px;margin:0 auto;padding:10px 10px 22px}
 .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:9px}
 button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 12px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer}
 .hint{margin-left:auto;color:var(--muted);font-size:11px}
 .shell{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
 .scroll{overflow:auto;-webkit-overflow-scrolling:touch;max-height:calc(100vh - 180px);overscroll-behavior:contain}
-
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed;background:#fff}
 th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
 tr>*:last-child{border-right:0}
@@ -76,6 +78,7 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 </style>
 </head>
 <body>
+
 <div class="notice" id="notice" hidden>
   <div class="notice-icon">🔔</div>
   <div class="notice-window">
@@ -89,7 +92,7 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
     <h1 id="title">9/27(日)~10/4(日) 彌勒山12人小組</h1>
     <div class="sub" id="subtitle">9/27（日）～10/4（日）</div>
     <div class="sync">
-      <span><span class="dot"></span><span id="syncText">正在同步資料…</span></span>
+      <span><span class="dot"></span><span id="syncText">正在連線 Google 試算表…</span></span>
       <span id="updated"></span>
     </div>
   </div>
@@ -106,79 +109,185 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
       <div id="content" class="status">正在讀取勤務表…</div>
     </div>
   </div>
-  <div class="footer">每 30 秒檢查一次；試算表有變更才重繪表格。</div>
+  <div class="footer">每 30 秒重新查詢 Google 試算表；內容有變更才重繪。</div>
 </main>
 
 <script>
-// 這是你目前 Apps Script 的部署網址。
-// Apps Script 只當資料 API，不會顯示在使用者畫面上。
-const API_URL =
-  'https://script.google.com/macros/s/AKfycbw_I1GliiFmkZL4sEXYkw7vpuwGraltuopzMCb73gl_LDgQb4VTrYSZ5hGqiDUNWlePQ/exec';
-
-const CHECK_MS = 30000;
-let currentData=null,currentVersion='',pollTimer=null,jsonpScript=null;
-let noticeTimer=null,noticeMessages=[],noticeIndex=0;
-
-const $=id=>document.getElementById(id);
-$('refreshBtn').addEventListener('click',()=>loadData(true));
-$('todayBtn').addEventListener('click',jumpToday);
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible') loadData(false);
-});
-
-window.dutyJsonpCallback=function(payload){
-  cleanupJsonp();
-  if(!payload || !payload.ok){
-    showError(payload?.error || 'API 回傳失敗');
-    schedule();
-    return;
-  }
-
-  const data=payload.data;
-  if(!currentData || data.version!==currentVersion){
-    currentData=data;
-    currentVersion=data.version||'';
-    render(data);
-  }else{
-    setSync('已同步');
-    $('updated').textContent='最近檢查：'+nowText();
-  }
-  schedule();
+const CONFIG = {
+  SPREADSHEET_ID:'1GEE-2ISgzqAca-SblK2SSu8e7a_rlwyrkjH73wiHiW4',
+  DATA_GID:'303688467',
+  SETTINGS_GID:'987654321',
+  CHECK_MS:30000,
+  NOTICE:'初步先了解能夠參與的日期，如果有不過夜，請明確告知參與的時間範圍'
 };
 
-function loadData(force){
-  clearTimeout(pollTimer);
-  cleanupJsonp();
-  if(force) setSync('正在更新…');
+let currentData=null;
+let currentHash='';
+let timer=null;
+let noticeTimer=null;
+let noticeMessages=[];
+let noticeIndex=0;
+let querySerial=0;
 
-  const s=document.createElement('script');
-  s.src=API_URL
-    +'?callback=dutyJsonpCallback'
-    +'&_='+Date.now();
-  s.async=true;
-  s.onerror=()=>{
-    cleanupJsonp();
-    showError('無法連線到資料 API，請確認 Apps Script 已部署為「任何人」可存取。');
-    schedule();
+const $=id=>document.getElementById(id);
+
+$('refreshBtn').addEventListener('click',()=>refresh(true));
+$('todayBtn').addEventListener('click',jumpToday);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible') refresh(false);
+});
+
+google.charts.load('current',{packages:['table']});
+google.charts.setOnLoadCallback(()=>refresh(true));
+
+function queryUrl(gid,range){
+  return 'https://docs.google.com/spreadsheets/d/'+CONFIG.SPREADSHEET_ID+
+         '/gviz/tq?gid='+encodeURIComponent(gid)+
+         '&range='+encodeURIComponent(range)+
+         '&headers=0'+
+         '&_='+Date.now()+'_'+(++querySerial);
+}
+
+function runQuery(gid,range){
+  return new Promise((resolve,reject)=>{
+    try{
+      const query=new google.visualization.Query(queryUrl(gid,range));
+      query.setQuery('select *');
+      query.send(response=>{
+        if(response.isError()){
+          reject(new Error(response.getMessage()+(response.getDetailedMessage()?'：'+response.getDetailedMessage():'')));
+          return;
+        }
+        resolve(dataTableToRows(response.getDataTable()));
+      });
+    }catch(err){
+      reject(err);
+    }
+  });
+}
+
+function dataTableToRows(dt){
+  const rows=[];
+  for(let r=0;r<dt.getNumberOfRows();r++){
+    const row=[];
+    for(let c=0;c<dt.getNumberOfColumns();c++){
+      let v=dt.getFormattedValue(r,c);
+      if(v==null || v===''){
+        const raw=dt.getValue(r,c);
+        v=raw==null?'':String(raw);
+      }
+      row.push(String(v??''));
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+async function refresh(force){
+  clearTimeout(timer);
+  if(force)setSync('正在更新…');
+
+  try{
+    const dataRows=await runQuery(CONFIG.DATA_GID,'A1:I100');
+
+    let settingsRows=[];
+    try{
+      settingsRows=await runQuery(CONFIG.SETTINGS_GID,'A1:B30');
+    }catch(_){
+      // 設定頁抓不到不影響勤務表，公告使用預設文字。
+    }
+
+    const data=buildData(dataRows,settingsRows);
+    const hash=JSON.stringify(data);
+
+    if(force || hash!==currentHash){
+      currentHash=hash;
+      currentData=data;
+      render(data);
+    }else{
+      setSync('已同步');
+      $('updated').textContent='最近檢查：'+nowText();
+    }
+  }catch(err){
+    showError(err);
+  }finally{
+    timer=setTimeout(()=>refresh(false),CONFIG.CHECK_MS);
+  }
+}
+
+function buildData(rows,settingsRows){
+  if(!rows || rows.length<4) throw new Error('Google 試算表沒有回傳完整勤務資料');
+
+  const title=cell(rows,0,0)||'彌勒山12人小組勤務安排';
+  const groupRow=padSlice(rows[1]||[],1,9);
+  const dateRow=padSlice(rows[2]||[],1,9);
+  const timeRow=padSlice(rows[3]||[],1,9);
+
+  let noteIndex=rows.findIndex(r=>String(r[0]||'').trim()==='備註');
+  if(noteIndex<0)noteIndex=rows.length;
+
+  const labels=[];
+  for(let r=4;r<noteIndex;r++){
+    const x=cell(rows,r,0).trim();
+    if(x)labels.push(x);
+  }
+
+  const groups=[];
+  let currentGroup='';
+  for(let i=0;i<8;i++){
+    const g=String(groupRow[i]||'').replace(/\s+/g,' ').trim();
+    if(g)currentGroup=g;
+    groups.push(currentGroup);
+  }
+
+  const days=[];
+  for(let c=0;c<8;c++){
+    const dateText=String(dateRow[c]||'').trim();
+    if(!dateText)continue;
+
+    const people=[];
+    for(let r=4;r<noteIndex;r++){
+      const name=cell(rows,r,c+1).trim();
+      if(name)people.push({no:cell(rows,r,0).trim(),name});
+    }
+
+    const notes=[];
+    for(let r=noteIndex;r<rows.length;r++){
+      const n=cell(rows,r,c+1).trim();
+      if(n)notes.push(n);
+    }
+
+    days.push({
+      dateText,
+      isoDate:toIso(dateText),
+      group:groups[c]||'',
+      time:String(timeRow[c]||'').trim(),
+      people,
+      notes
+    });
+  }
+
+  const settings={};
+  settingsRows.forEach((r,i)=>{
+    if(i===0)return;
+    const k=String(r[0]||'').trim();
+    if(k)settings[k]=String(r[1]||'').trim();
+  });
+
+  return {
+    title,
+    subtitle:settings['頁面副標題']||'9/27（日）～10/4（日）',
+    announcement:settings['跑馬燈公告']||settings['上翻式公告']||CONFIG.NOTICE,
+    rowLabels:labels,
+    days,
+    today:todayIso()
   };
-  jsonpScript=s;
-  document.head.appendChild(s);
-}
-
-function cleanupJsonp(){
-  if(jsonpScript && jsonpScript.parentNode) jsonpScript.parentNode.removeChild(jsonpScript);
-  jsonpScript=null;
-}
-
-function schedule(){
-  clearTimeout(pollTimer);
-  pollTimer=setTimeout(()=>loadData(false),CHECK_MS);
 }
 
 function render(data){
-  $('title').textContent=data.title||'彌勒山12人小組勤務安排';
-  $('subtitle').textContent=data.subtitle||'';
-  setupNotice(data.announcement||'');
+  $('title').textContent=data.title;
+  $('subtitle').textContent=data.subtitle;
+  setupNotice(data.announcement);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
   setSync('已同步');
@@ -202,13 +311,14 @@ function setupNotice(text){
   b.className='notice-item';
   b.textContent=noticeMessages[1]||noticeMessages[0];
 
-  // 即使只有一則，也會定時做上翻效果。
   noticeTimer=setInterval(()=>{
     const next=(noticeIndex+1)%noticeMessages.length;
     b.textContent=noticeMessages[next]||noticeMessages[0];
     b.className='notice-item';
     void b.offsetWidth;
-    a.classList.add('out');a.classList.remove('show');b.classList.add('show');
+    a.classList.add('out');
+    a.classList.remove('show');
+    b.classList.add('show');
 
     setTimeout(()=>{
       noticeIndex=next;
@@ -220,14 +330,12 @@ function setupNotice(text){
 }
 
 function buildTable(data){
-  if(!data.days||!data.days.length) return '<div class="status">目前沒有勤務資料。</div>';
+  if(!data.days.length)return '<div class="status">目前沒有勤務資料。</div>';
 
-  const labels=(data.rowLabels&&data.rowLabels.length)
-    ? data.rowLabels
-    : Array.from({length:17},(_,i)=>String(i+1));
-  const groups=groupSpans(data.days);
+  const labels=data.rowLabels.length?data.rowLabels:Array.from({length:17},(_,i)=>String(i+1));
+  const gs=groupSpans(data.days);
 
-  const groupHtml=groups.map(g=>
+  const groupHtml=gs.map(g=>
     `<th class="day-col ${g.start?'group-start':''}" colspan="${g.span}">${esc(g.name)}</th>`
   ).join('');
 
@@ -245,13 +353,13 @@ function buildTable(data){
   ).join('');
 
   const body=labels.map(label=>{
-    const cells=data.days.map((d,i)=>{
+    const tds=data.days.map((d,i)=>{
       const p=(d.people||[]).find(x=>String(x.no)===String(label));
       return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
         ${p?`<span class="person">${esc(p.name)}</span>`:'<span class="empty">—</span>'}
       </td>`;
     }).join('');
-    return `<tr><th class="row-label">${esc(label)}</th>${cells}</tr>`;
+    return `<tr><th class="row-label">${esc(label)}</th>${tds}</tr>`;
   }).join('');
 
   const hasNotes=data.days.some(d=>d.notes&&d.notes.length);
@@ -279,14 +387,15 @@ function groupSpans(days){
   while(start<days.length){
     const name=days[start].group||'';
     let end=start+1;
-    while(end<days.length&&(days[end].group||'')===name) end++;
+    while(end<days.length&&(days[end].group||'')===name)end++;
     out.push({name,span:end-start,start:start>0});
     start=end;
   }
   return out;
 }
+
 function groupStart(days,i){
-  if(i<=0) return '';
+  if(i<=0)return '';
   return (days[i].group||'')!==(days[i-1].group||'')?'group-start':'';
 }
 function todayClass(d,data){return d.isoDate===data.today?'today-col':''}
@@ -299,27 +408,33 @@ function jumpToday(){
   if(target)$('tableScroll').scrollTo({left:Math.max(0,target.offsetLeft-42),top:0,behavior:'smooth'});
 }
 
-function setSync(t){$('syncText').textContent=t}
-function showError(msg){
-  setSync('同步失敗');
-  $('updated').textContent='稍後會自動重試';
-  $('content').className='status';
-  $('content').innerHTML=
-    '<div class="error-title">目前無法讀取勤務資料</div>'+
-    '<div>'+esc(msg)+'</div>';
+function cell(rows,r,c){return String((rows[r]&&rows[r][c])??'')}
+function padSlice(arr,a,b){const o=[];for(let i=a;i<b;i++)o.push(String(arr[i]??''));return o}
+function toIso(text){
+  const m=String(text).match(/(\d{1,2})\/(\d{1,2})/);
+  return m?`2026-${String(+m[1]).padStart(2,'0')}-${String(+m[2]).padStart(2,'0')}`:'';
+}
+function todayIso(){
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const o={};p.forEach(x=>o[x.type]=x.value);
+  return `${o.year}-${o.month}-${o.day}`;
 }
 function nowText(){
-  return new Intl.DateTimeFormat('zh-TW',{
-    timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',
-    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
-  }).format(new Date());
+  return new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
+}
+function setSync(t){$('syncText').textContent=t}
+function showError(err){
+  setSync('同步失敗');
+  $('updated').textContent='稍後自動重試';
+  $('content').className='status';
+  $('content').innerHTML=
+    '<div class="error-title">目前無法讀取 Google 試算表</div>'+
+    '<div>請確認這份試算表仍保持「發布到網路」。</div>'+
+    '<div style="margin-top:6px;font-size:11px">'+esc(err?.message||String(err))+'</div>';
 }
 function esc(v){
-  return String(v??'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
-loadData(true);
 </script>
 </body>
 </html>
