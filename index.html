@@ -11,7 +11,7 @@
 
 <style>
 :root{
-  --bg:#f4f6f3;--ink:#25312c;--muted:#748078;--line:#d8dfdb;
+  --bg:#f4f6f3;--ink:#17201c;--muted:#4f5d55;--line:#c8d0cc;
   --brand:#3d735f;--brand-dark:#315b4c;--brand-soft:#e9f1ed;
   --warn-bg:#fff5d8;--warn-line:#ead28d;--warn-ink:#66531a;
   --accent:#b74739;--today:#fff7d2;--today-head:#efd36f;
@@ -24,56 +24,92 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Pin
 .notice{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:9px;min-height:46px;padding:0 12px;background:var(--warn-bg);border-bottom:1px solid var(--warn-line);color:var(--warn-ink)}
 .notice-icon{font-size:18px;flex:0 0 auto}
 .notice-window{position:relative;height:28px;flex:1;overflow:hidden}
-.notice-item{position:absolute;inset:0;display:flex;align-items:center;font-size:14px;line-height:1.3;font-weight:800;opacity:0;transform:translateY(110%);transition:transform .55s ease,opacity .42s ease}
+.notice-item{position:absolute;inset:0;display:flex;align-items:center;font-size:18px;line-height:1.45;font-weight:900;opacity:0;transform:translateY(110%);transition:transform .55s ease,opacity .42s ease}
 .notice-item.show{opacity:1;transform:translateY(0)}
 .notice-item.out{opacity:0;transform:translateY(-110%)}
 
 .hero{background:linear-gradient(135deg,var(--brand-dark),#4d7b69);color:#fff;padding:18px 14px 15px}
 .hero-inner{max-width:1500px;margin:0 auto}
-h1{margin:0;font-size:clamp(24px,4vw,36px);line-height:1.2}
-.sub{margin-top:6px;font-size:14px;opacity:.92}
-.sync{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;opacity:.86}
+h1{margin:0;font-size:clamp(30px,4.5vw,42px);line-height:1.2}
+.sub{margin-top:6px;font-size:18px;opacity:.96}
+.sync{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:15px;opacity:.94}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#a6e4bd;box-shadow:0 0 0 3px rgba(166,228,189,.14)}
 .wrap{max-width:1500px;margin:0 auto;padding:10px 10px 22px}
 .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:9px}
-button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 12px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer}
-.hint{margin-left:auto;color:var(--muted);font-size:11px}
+button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 16px;border-radius:12px;font-weight:900;font-size:17px;cursor:pointer}
+.hint{margin-left:auto;color:var(--muted);font-size:15px}
 .shell{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
 .scroll{overflow:auto;-webkit-overflow-scrolling:touch;max-height:calc(100vh - 180px);overscroll-behavior:contain}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed;background:#fff}
 th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
 tr>*:last-child{border-right:0}
 tbody tr:last-child>*{border-bottom:0}
-.corner,.row-label{position:sticky;left:0;z-index:12;width:48px;min-width:48px;max-width:48px;background:#f8faf8;font-weight:900}
-.group-row th{position:sticky;top:0;z-index:20;height:34px;padding:5px 6px;background:var(--brand-soft);color:var(--brand-dark);font-size:12px;font-weight:900}
+.corner,.row-label{position:sticky;left:0;z-index:12;width:58px;min-width:58px;max-width:58px;background:#f8faf8;font-weight:900}
+.group-row th{position:sticky;top:0;z-index:20;height:42px;padding:7px 8px;background:var(--brand-soft);color:var(--brand-dark);font-size:16px;font-weight:900}
 .group-row .corner{z-index:30}
-.date-row th{position:sticky;top:34px;z-index:19;height:46px;padding:5px 6px;background:#edf2ef;font-size:14px;font-weight:900;white-space:nowrap}
+.date-row th{position:sticky;top:42px;z-index:19;height:58px;padding:5px 6px;background:#edf2ef;font-size:19px;font-weight:900;white-space:nowrap}
 .date-row .corner{z-index:29}
-.time-row th{position:sticky;top:80px;z-index:18;min-height:48px;padding:5px 6px;background:#fbfcfb;color:var(--accent);font-size:11px;line-height:1.35;font-weight:900;white-space:normal}
+.time-row th{position:sticky;top:100px;z-index:18;min-height:60px;padding:5px 6px;background:#fbfcfb;color:#a1382d;font-size:15px;line-height:1.35;font-weight:900;white-space:normal}
 .time-row .corner{z-index:28;color:var(--ink)}
-.day-col{width:138px;min-width:138px;max-width:138px}
+.day-col{width:170px;min-width:170px;max-width:170px}
 .today-col{background:var(--today)!important}
 .date-row .today-col{background:var(--today-head)!important;color:#6c5411}
 .today-mark{display:block;margin-top:2px;font-size:10px;color:#72590f;font-weight:900}
-tbody td{height:42px;padding:5px 6px;background:#fff;font-size:14px;line-height:1.25;word-break:break-word}
+tbody td{height:54px;padding:8px 7px;background:#fff;font-size:19px;line-height:1.25;word-break:break-word}
 tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
-.person{font-weight:800}.empty{color:#c9d0cc}.group-start{border-left:3px solid #a6b9af!important}
-.notes-row td{height:auto;padding:8px;text-align:left;background:#fbf9f1;color:#625c4f;font-size:12px;line-height:1.45}
+.person{font-weight:900}.empty{color:#c9d0cc}.group-start{border-left:3px solid #a6b9af!important}
+.notes-row td{height:auto;padding:8px;text-align:left;background:#fbf9f1;color:#625c4f;font-size:16px;line-height:1.6}
 .notes-row .row-label{text-align:center;background:#f4f2eb;color:var(--ink)}
 .status{padding:42px 18px;text-align:center;color:var(--muted)}
 .error-title{font-weight:900;color:#8f3f34;margin-bottom:7px}
-.footer{padding:9px 6px 0;text-align:center;color:var(--muted);font-size:11px}
+.footer{padding:9px 6px 0;text-align:center;color:var(--muted);font-size:15px}
 
 @media(max-width:640px){
-  .notice{min-height:42px;padding:0 9px}.notice-window{height:25px}.notice-item{font-size:12px}
-  .hero{padding:13px 10px 12px}h1{font-size:23px}.sub{font-size:12px}.wrap{padding:7px 6px 15px}
-  .hint{width:100%;margin-left:0}.shell{border-radius:9px}.scroll{max-height:calc(100vh - 158px)}
-  .corner,.row-label{width:40px;min-width:40px;max-width:40px;font-size:11px}
-  .day-col{width:104px;min-width:104px;max-width:104px}
-  .group-row th{height:31px;padding:4px 3px;font-size:10px}
-  .date-row th{top:31px;height:40px;padding:4px 3px;font-size:12px}
-  .time-row th{top:71px;padding:4px 3px;font-size:9.5px}
-  tbody td{height:38px;padding:4px 3px;font-size:12px}
+  .notice{min-height:52px;padding:0 10px}
+  .notice-window{height:34px}
+  .notice-item{font-size:17px;line-height:1.45}
+
+  .hero{padding:16px 12px 14px}
+  h1{font-size:28px;line-height:1.25}
+  .sub{font-size:17px}
+  .sync{font-size:14px}
+  .wrap{padding:8px 6px 16px}
+
+  .toolbar{gap:10px}
+  button{font-size:17px;padding:11px 15px}
+  .hint{width:100%;margin-left:0;font-size:14px;line-height:1.5}
+
+  .shell{border-radius:10px}
+  .scroll{max-height:calc(100vh - 185px)}
+
+  .corner,.row-label{
+    width:52px;min-width:52px;max-width:52px;
+    font-size:15px
+  }
+
+  .day-col{
+    width:142px;min-width:142px;max-width:142px
+  }
+
+  .group-row th{
+    height:40px;padding:6px 4px;font-size:14px
+  }
+
+  .date-row th{
+    top:40px;height:54px;padding:6px 4px;font-size:18px
+  }
+
+  .time-row th{
+    top:94px;padding:6px 4px;font-size:15px;line-height:1.45
+  }
+
+  tbody td{
+    height:50px;padding:7px 4px;font-size:18px
+  }
+
+  .person{font-size:18px;font-weight:900}
+  .notes-row td{font-size:15px;line-height:1.6}
+  .footer{font-size:13px;line-height:1.5}
 }
 </style>
 </head>
@@ -109,7 +145,7 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
       <div id="content" class="status">正在讀取勤務表…</div>
     </div>
   </div>
-  <div class="footer">每 30 秒重新查詢 Google 試算表；內容有變更才重繪。</div>
+  <div class="footer">每 30 秒重新查詢 Google 試算表；內容有變更才重繪。｜已採大字、高對比版面。</div>
 </main>
 
 <script>
@@ -430,7 +466,7 @@ function showError(err){
   $('content').innerHTML=
     '<div class="error-title">目前無法讀取 Google 試算表</div>'+
     '<div>請確認這份試算表仍保持「發布到網路」。</div>'+
-    '<div style="margin-top:6px;font-size:11px">'+esc(err?.message||String(err))+'</div>';
+    '<div style="margin-top:6px;font-size:15px">'+esc(err?.message||String(err))+'</div>';
 }
 function esc(v){
   return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
