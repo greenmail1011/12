@@ -28,12 +28,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Pin
 .notice-item.show{opacity:1;transform:translateY(0)}
 .notice-item.out{opacity:0;transform:translateY(-110%)}
 
-.hero{background:linear-gradient(135deg,#b95f36 0%,#d97e4d 48%,#f0aa73 100%);color:#fff;padding:18px 14px 15px}
+.hero{background:linear-gradient(135deg,#b95f36 0%,#d97e4d 48%,#f0aa73 100%);color:#fff;padding:16px 14px}
 .hero-inner{max-width:1500px;margin:0 auto}
 h1{margin:0;font-size:clamp(30px,4.5vw,42px);line-height:1.2;text-shadow:0 1px 2px rgba(70,35,18,.28)}
-.sub{margin-top:6px;font-size:18px;opacity:.96}
-.sync{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:15px;opacity:.94}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#ffd0aa;box-shadow:0 0 0 3px rgba(255,208,170,.18)}
 .wrap{max-width:1500px;margin:0 auto;padding:10px 10px 22px}
 .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:9px}
 button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 16px;border-radius:12px;font-weight:900;font-size:17px;cursor:pointer}
@@ -71,9 +68,7 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 
   .hero{padding:16px 12px 14px}
   h1{font-size:28px;line-height:1.25}
-  .sub{font-size:17px}
-  .sync{font-size:14px}
-  .wrap{padding:8px 6px 16px}
+      .wrap{padding:8px 6px 16px}
 
   .toolbar{gap:10px}
   button{font-size:17px;padding:11px 15px}
@@ -127,11 +122,6 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 <section class="hero">
   <div class="hero-inner">
     <h1 id="title">9/27(日)~10/4(日) 彌勒山12人小組</h1>
-    <div class="sub" id="subtitle">9/27（日）～10/4（日）</div>
-    <div class="sync">
-      <span><span class="dot"></span><span id="syncText">正在連線 Google 試算表…</span></span>
-      <span id="updated"></span>
-    </div>
   </div>
 </section>
 
@@ -224,7 +214,6 @@ function dataTableToRows(dt){
 
 async function refresh(force){
   clearTimeout(timer);
-  if(force)setSync('正在更新…');
 
   try{
     const dataRows=await runQuery(CONFIG.DATA_GID,'A1:I100');
@@ -244,8 +233,7 @@ async function refresh(force){
       currentData=data;
       render(data);
     }else{
-      setSync('已同步');
-      $('updated').textContent='最近檢查：'+nowText();
+          $('updated').textContent='最近檢查：'+nowText();
     }
   }catch(err){
     showError(err);
@@ -341,12 +329,9 @@ function buildData(rows,settingsRows){
 
 function render(data){
   $('title').textContent=data.title;
-  $('subtitle').textContent=data.subtitle;
   setupNotice(data.announcements);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
-  setSync('已同步');
-  $('updated').textContent='最後更新：'+nowText()+'｜每 30 秒檢查';
 }
 
 function normalizeNoticeText(text){
@@ -374,7 +359,14 @@ function setupNotice(items){
   a.textContent=noticeMessages[0];
   a.className='notice-item show';
   b.className='notice-item';
-  b.textContent=noticeMessages[1]||noticeMessages[0];
+
+  // 只有一則公告時就固定顯示，不做任何上翻動畫。
+  if(noticeMessages.length === 1){
+    b.textContent='';
+    return;
+  }
+
+  b.textContent=noticeMessages[1];
 
   noticeTimer=setInterval(()=>{
     const next=(noticeIndex+1)%noticeMessages.length;
@@ -484,13 +476,7 @@ function todayIso(){
   const o={};p.forEach(x=>o[x.type]=x.value);
   return `${o.year}-${o.month}-${o.day}`;
 }
-function nowText(){
-  return new Intl.DateTimeFormat('zh-TW',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date());
-}
-function setSync(t){$('syncText').textContent=t}
 function showError(err){
-  setSync('同步失敗');
-  $('updated').textContent='稍後自動重試';
   $('content').className='status';
   $('content').innerHTML=
     '<div class="error-title">目前無法讀取 Google 試算表</div>'+
