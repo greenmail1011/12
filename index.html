@@ -5,36 +5,36 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#315b4c">
 <title>彌勒山12人小組勤務安排</title>
-
 <!-- Google Visualization Query：直接讀取已「發布到網路」的 Google 試算表 -->
 <script src="https://www.gstatic.com/charts/loader.js"></script>
-
 <style>
 :root{
   --bg:#f4f6f3;--ink:#17201c;--muted:#4f5d55;--line:#c8d0cc;
   --brand:#e9a66f;--brand-dark:#c96f3d;--brand-soft:#fff1e5;
   --warn-bg:#fff3e7;--warn-line:#efc39f;--warn-ink:#633b20;
   --accent:#c66b3d;--today:#fff2df;--today-head:#f5c08f;
+  --ok:#2f6b4f;--open:#b4522a;
   --shadow:0 10px 28px rgba(32,58,48,.08)
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
-
 .notice{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;min-height:82px;padding:9px 12px;background:linear-gradient(90deg,#fff7ee 0%,#ffe8d2 48%,#ffd9bb 100%);border-bottom:1px solid var(--warn-line);color:#5f361d}
 .notice-icon{font-size:18px;flex:0 0 auto}
 .notice-window{position:relative;height:66px;flex:1;overflow:hidden}
 .notice-item{position:absolute;inset:0;display:flex;align-items:center;font-size:18px;line-height:1.55;font-weight:900;opacity:0;transform:translateY(110%);transition:transform .55s ease,opacity .42s ease;white-space:normal;overflow:hidden;padding-right:4px}
 .notice-item.show{opacity:1;transform:translateY(0)}
 .notice-item.out{opacity:0;transform:translateY(-110%)}
-
 .hero{background:linear-gradient(135deg,#b95f36 0%,#d97e4d 48%,#f0aa73 100%);color:#fff;padding:16px 14px}
 .hero-inner{max-width:1500px;margin:0 auto}
 h1{margin:0;font-size:clamp(30px,4.5vw,42px);line-height:1.2;text-shadow:0 1px 2px rgba(70,35,18,.28)}
 .wrap{max-width:1500px;margin:0 auto;padding:10px 10px 22px}
 .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:9px}
-button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 16px;border-radius:12px;font-weight:900;font-size:17px;cursor:pointer}
+button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 16px;border-radius:12px;font-weight:900;font-size:17px;cursor:pointer;font-family:inherit}
+button:disabled{opacity:.5;cursor:not-allowed}
 .hint{margin-left:0;color:var(--muted);font-size:15px}
+.warnbar{margin:0 0 9px;padding:10px 12px;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn-ink);border-radius:11px;font-size:15px;font-weight:800;line-height:1.55}
+.warnbar[hidden]{display:none}
 .shell{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
 .scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;max-height:none;overscroll-behavior:auto}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed;background:#fff}
@@ -43,11 +43,13 @@ tr>*:last-child{border-right:0}
 tbody tr:last-child>*{border-bottom:0}
 .corner,.row-label{position:static;width:58px;min-width:58px;max-width:58px;background:#f8faf8;font-weight:900}
 .group-row th{position:static;height:44px;padding:7px 8px;background:linear-gradient(180deg,#fff3e8 0%,#fde2ca 100%);color:#74401f;font-size:16px;font-weight:900;vertical-align:middle}
-
 .date-row th{position:static;height:64px;padding:7px 8px;background:linear-gradient(180deg,#fffaf5 0%,#fbe8d8 100%);font-size:23px;font-weight:900;white-space:nowrap;vertical-align:middle}
-
 .time-row th{position:static;height:88px;padding:8px 7px;background:#fffdf9;color:#a64f2c;font-size:16px;line-height:1.55;font-weight:900;white-space:normal;overflow:visible;vertical-align:middle}
 .time-row .corner{color:var(--ink)}
+.count-row th{position:static;height:46px;padding:6px 8px;background:#fbfaf6;font-size:16px;font-weight:900;white-space:nowrap;vertical-align:middle}
+.count-row .corner{color:var(--ink);font-size:15px}
+.cnt-full{color:var(--ok)}
+.cnt-open{color:var(--open)}
 .day-col{width:170px;min-width:170px;max-width:170px}
 .today-col{background:var(--today)!important}
 .date-row .today-col{background:var(--today-head)!important;color:#78451f}
@@ -59,50 +61,26 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 .notes-row .row-label{text-align:center;background:#f4f2eb;color:var(--ink)}
 .status{padding:42px 18px;text-align:center;color:var(--muted)}
 .error-title{font-weight:900;color:#8f3f34;margin-bottom:7px}
-.footer{padding:9px 6px 0;text-align:center;color:var(--muted);font-size:15px}
-
+.footer{padding:9px 6px 0;text-align:center;color:var(--muted);font-size:15px;line-height:1.6}
 @media(max-width:640px){
   .notice{min-height:92px;padding:10px 10px}
   .notice-window{height:74px}
   .notice-item{font-size:17px;line-height:1.55}
-
   .hero{padding:16px 12px 14px}
   h1{font-size:28px;line-height:1.25}
-      .wrap{padding:8px 6px 16px}
-
-  .toolbar{gap:10px}
-  button{font-size:17px;padding:11px 15px}
+  .wrap{padding:8px 6px 16px}
+  .toolbar{gap:8px}
+  button{font-size:16px;padding:11px 13px}
   .hint{width:100%;margin-left:0;font-size:14px;line-height:1.5}
-
   .shell{border-radius:10px}
   .scroll{max-height:none}
-
-  .corner,.row-label{
-    position:static;
-    width:52px;min-width:52px;max-width:52px;
-    font-size:15px
-  }
-
-  .day-col{
-    width:154px;min-width:154px;max-width:154px
-  }
-
-  .group-row th{
-    height:42px;padding:6px 4px;font-size:15px
-  }
-
-  .date-row th{
-    height:60px;padding:7px 5px;font-size:21px
-  }
-
-  .time-row th{
-    height:86px;padding:8px 5px;font-size:16px;line-height:1.55;overflow:visible
-  }
-
-  tbody td{
-    height:56px;padding:8px 5px;font-size:20px
-  }
-
+  .corner,.row-label{position:static;width:52px;min-width:52px;max-width:52px;font-size:15px}
+  .day-col{width:154px;min-width:154px;max-width:154px}
+  .group-row th{height:42px;padding:6px 4px;font-size:15px}
+  .date-row th{height:60px;padding:7px 5px;font-size:21px}
+  .time-row th{height:86px;padding:8px 5px;font-size:16px;line-height:1.55;overflow:visible}
+  .count-row th{height:44px;padding:6px 4px;font-size:15px}
+  tbody td{height:56px;padding:8px 5px;font-size:20px}
   .person{font-size:20px;font-weight:900}
   .notes-row td{font-size:15px;line-height:1.6}
   .footer{font-size:13px;line-height:1.5}
@@ -110,7 +88,6 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 </style>
 </head>
 <body>
-
 <div class="notice" id="notice" hidden>
   <div class="notice-icon">🔔</div>
   <div class="notice-window">
@@ -118,14 +95,17 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
     <div class="notice-item" id="noticeB"></div>
   </div>
 </div>
-
 <section class="hero">
   <div class="hero-inner">
     <h1 id="title">9/27(日)~10/4(日) 彌勒山12人小組</h1>
   </div>
 </section>
-
 <main class="wrap">
+  <div class="toolbar">
+    <button id="btnRefresh" type="button">🔄 立即更新</button>
+    <span class="hint" id="updated">正在讀取…</span>
+  </div>
+  <div class="warnbar" id="warnbar" hidden></div>
   <div class="shell">
     <div class="scroll" id="tableScroll">
       <div id="content" class="status">正在讀取勤務表…</div>
@@ -138,7 +118,11 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 const CONFIG = {
   SPREADSHEET_ID:'1GEE-2ISgzqAca-SblK2SSu8e7a_rlwyrkjH73wiHiW4',
   DATA_GID:'303688467',
-  SETTINGS_GID:'987654321',
+  // 每天預計要幾個人（12 人小組）。設 0 就只顯示已報名人數、不判斷額滿。
+  // 試算表目前有 17 個編號列，所以這裡是「目標人數」，不是實際可填的格數。
+  TARGET_PER_DAY:12,
+  // 沒有「設定」分頁就留空字串，避免每 30 秒多打一次註定失敗的請求。
+  SETTINGS_GID:'',
   CHECK_MS:30000,
   NOTICE:'請先確認可以參與的日期；若不過夜，請明確告知參與的時間範圍。'
 };
@@ -153,12 +137,39 @@ let querySerial=0;
 
 const $=id=>document.getElementById(id);
 
+/* ---------- 小工具 ---------- */
+function nowText(){
+  return new Intl.DateTimeFormat('zh-TW',{
+    timeZone:'Asia/Taipei',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+  }).format(new Date());
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function setStatus(text){const el=$('updated');if(el)el.textContent=text}
+function setWarn(text){
+  const el=$('warnbar');if(!el)return;
+  if(text){el.textContent=text;el.hidden=false}else{el.hidden=true;el.textContent=''}
+}
+function esc(v){
+  return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function cell(rows,r,c){return String((rows[r]&&rows[r][c])??'')}
+function padSlice(arr,a,b){const o=[];for(let i=a;i<b;i++)o.push(String(arr[i]??''));return o}
+function toIso(text){
+  const m=String(text).match(/(\d{1,2})\/(\d{1,2})/);
+  return m?`2026-${String(+m[1]).padStart(2,'0')}-${String(+m[2]).padStart(2,'0')}`:'';
+}
+function todayIso(){
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const o={};p.forEach(x=>o[x.type]=x.value);
+  return `${o.year}-${o.month}-${o.day}`;
+}
+
+/* ---------- 讀取 Google 試算表 ---------- */
+google.charts.load('current',{packages:['table']});
+google.charts.setOnLoadCallback(()=>refresh(true));
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible') refresh(false);
 });
-
-google.charts.load('current',{packages:['table']});
-google.charts.setOnLoadCallback(()=>refresh(true));
 
 function queryUrl(gid,range){
   return 'https://docs.google.com/spreadsheets/d/'+CONFIG.SPREADSHEET_ID+
@@ -167,7 +178,6 @@ function queryUrl(gid,range){
          '&headers=1'+
          '&_='+Date.now()+'_'+(++querySerial);
 }
-
 function runQuery(gid,range){
   return new Promise((resolve,reject)=>{
     try{
@@ -185,10 +195,8 @@ function runQuery(gid,range){
     }
   });
 }
-
 function dataTableToRows(dt){
   const rows=[];
-
   // GViz 會把試算表第一列當成欄位標題，不放在資料列中。
   // 這裡把欄位標題補回第一列，才能和原始 Google Sheet 列號完全一致。
   const header=[];
@@ -196,7 +204,6 @@ function dataTableToRows(dt){
     header.push(String(dt.getColumnLabel(c) || ''));
   }
   rows.push(header);
-
   for(let r=0;r<dt.getNumberOfRows();r++){
     const row=[];
     for(let c=0;c<dt.getNumberOfColumns();c++){
@@ -214,51 +221,77 @@ function dataTableToRows(dt){
 
 async function refresh(force){
   clearTimeout(timer);
-
   try{
     const dataRows=await runQuery(CONFIG.DATA_GID,'A1:I100');
-
     let settingsRows=[];
-    try{
-      settingsRows=await runQuery(CONFIG.SETTINGS_GID,'A1:B30');
-    }catch(_){
-      // 設定頁抓不到不影響勤務表，公告使用預設文字。
+    if(CONFIG.SETTINGS_GID){
+      try{
+        settingsRows=await runQuery(CONFIG.SETTINGS_GID,'A1:B30');
+      }catch(_){
+        // 設定頁抓不到不影響勤務表，公告使用預設文字。
+      }
     }
-
     const data=buildData(dataRows,settingsRows);
     const hash=JSON.stringify(data);
-
     if(force || hash!==currentHash){
       currentHash=hash;
       currentData=data;
       render(data);
+      setStatus('最近更新：'+nowText());
     }else{
-          $('updated').textContent='最近檢查：'+nowText();
+      currentData=data;
+      setStatus('最近檢查：'+nowText()+'（無變更）');
     }
+    setWarn('');
+    return data;
   }catch(err){
     showError(err);
+    return null;
   }finally{
     timer=setTimeout(()=>refresh(false),CONFIG.CHECK_MS);
   }
 }
 
+/* 讀取失敗時，如果畫面上已經有資料就只掛一條提醒，不要把整張表洗掉。 */
+function showError(err){
+  const message=err&&err.message?err.message:String(err);
+  if(currentData){
+    setWarn('⚠️ 暫時讀不到 Google 試算表（'+message+'）。以下顯示的是最後一次成功讀取的內容，系統會自動重試。');
+    setStatus('更新失敗：'+nowText());
+    return;
+  }
+  setWarn('');
+  setStatus('讀取失敗：'+nowText());
+  const el=$('content');
+  if(!el)return;
+  el.className='status';
+  el.innerHTML=
+    '<div class="error-title">目前無法讀取 Google 試算表</div>'+
+    '<div>請確認這份試算表仍保持「發布到網路」。</div>'+
+    '<div style="margin-top:6px;font-size:15px">'+esc(message)+'</div>';
+}
+
+/* ---------- 整理資料 ---------- */
 function buildData(rows,settingsRows){
   if(!rows || rows.length<4) throw new Error('Google 試算表沒有回傳完整勤務資料');
-
   const title=cell(rows,0,0)||'彌勒山12人小組勤務安排';
   const groupRow=padSlice(rows[1]||[],1,9);
   const dateRow=padSlice(rows[2]||[],1,9);
   const timeRow=padSlice(rows[3]||[],1,9);
-
+  // 找出「備註」列。注意：GViz 會把 A 欄視為數字欄，
+  // 「日期」「時間」「備註」這類文字會被讀成空字串，所以不能只靠文字比對。
+  // 先試文字，讀不到就用「A 欄最後一個有編號的列」往下推。
   let noteIndex=rows.findIndex(r=>String(r[0]||'').trim()==='備註');
-  if(noteIndex<0)noteIndex=rows.length;
-
+  if(noteIndex<0){
+    let lastLabel=-1;
+    for(let r=4;r<rows.length;r++){ if(cell(rows,r,0).trim())lastLabel=r; }
+    noteIndex=lastLabel>=0?lastLabel+1:rows.length;
+  }
   const labels=[];
   for(let r=4;r<noteIndex;r++){
     const x=cell(rows,r,0).trim();
     if(x)labels.push(x);
   }
-
   const groups=[];
   let currentGroup='';
   for(let i=0;i<8;i++){
@@ -266,108 +299,100 @@ function buildData(rows,settingsRows){
     if(g)currentGroup=g;
     groups.push(currentGroup);
   }
-
+  const slots=labels.length||17;                       // 表上實際可填的格數
+  const target=CONFIG.TARGET_PER_DAY>0
+    ? Math.min(CONFIG.TARGET_PER_DAY,slots)
+    : slots;                                            // 每天的目標人數
   const days=[];
   for(let c=0;c<8;c++){
     const dateText=String(dateRow[c]||'').trim();
     if(!dateText)continue;
-
     const people=[];
     for(let r=4;r<noteIndex;r++){
       const name=cell(rows,r,c+1).trim();
       if(name)people.push({no:cell(rows,r,0).trim(),name});
     }
-
     const notes=[];
     for(let r=noteIndex;r<rows.length;r++){
       const n=cell(rows,r,c+1).trim();
       if(n)notes.push(n);
     }
-
     days.push({
       dateText,
       isoDate:toIso(dateText),
       group:groups[c]||'',
       time:String(timeRow[c]||'').trim(),
       people,
-      notes
+      notes,
+      capacity:target,
+      slots,
+      filled:people.length,
+      remaining:Math.max(0,target-people.length)
     });
   }
-
   const settings={};
   const announcementItems=[];
-
   settingsRows.forEach((r,i)=>{
     if(i===0)return;
     const k=String(r[0]||'').trim();
     const v=String(r[1]||'').trim();
     if(!k)return;
-
     settings[k]=v;
-
     // A欄只要是「跑馬燈公告」「跑馬燈公告1」「跑馬燈公告2」……
     // B欄就視為一則完整公告；同一格內容不會再被拆開。
     if(/^跑馬燈公告(?:\d+)?$/.test(k) && v){
       announcementItems.push(v);
     }
   });
-
   if(!announcementItems.length){
     const fallback=settings['上翻式公告']||CONFIG.NOTICE;
     if(fallback)announcementItems.push(fallback);
   }
-
   return {
     title,
     subtitle:settings['頁面副標題']||'9/27（日）～10/4（日）',
     announcements:announcementItems,
     rowLabels:labels,
+    slots,
+    target,
     days,
     today:todayIso()
   };
 }
 
+/* ---------- 畫面 ---------- */
 function render(data){
   $('title').textContent=data.title;
   setupNotice(data.announcements);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
 }
-
 function normalizeNoticeText(text){
   // 同一個設定欄位視為「一則完整公告」，不依標點或換行拆開。
   return String(text || '').trim();
 }
-
 function setupNotice(items){
   clearInterval(noticeTimer);
-
   // 每一個設定項目就是一則完整公告，絕不再自動拆句。
   noticeMessages=(Array.isArray(items) ? items : [items])
     .map(s=>normalizeNoticeText(s))
     .filter(Boolean);
-
   noticeIndex=0;
-
   if(!noticeMessages.length){
     $('notice').hidden=true;
     return;
   }
-
   $('notice').hidden=false;
   const a=$('noticeA'),b=$('noticeB');
   a.textContent=noticeMessages[0];
   a.className='notice-item show';
   b.className='notice-item';
-
   // 只有一則公告時就固定顯示，不做任何上翻動畫。
   if(noticeMessages.length === 1){
     b.textContent='';
     return;
   }
-
   b.textContent=noticeMessages[1];
-
   noticeTimer=setInterval(()=>{
     const next=(noticeIndex+1)%noticeMessages.length;
     b.textContent=noticeMessages[next]||noticeMessages[0];
@@ -376,7 +401,6 @@ function setupNotice(items){
     a.classList.add('out');
     a.classList.remove('show');
     b.classList.add('show');
-
     setTimeout(()=>{
       noticeIndex=next;
       a.textContent=b.textContent;
@@ -385,30 +409,31 @@ function setupNotice(items){
     },580);
   },5600);
 }
-
 function buildTable(data){
   if(!data.days.length)return '<div class="status">目前沒有勤務資料。</div>';
-
   const labels=data.rowLabels.length?data.rowLabels:Array.from({length:17},(_,i)=>String(i+1));
   const gs=groupSpans(data.days);
-
   const groupHtml=gs.map(g=>
     `<th class="day-col ${g.start?'group-start':''}" colspan="${g.span}">${esc(g.name)}</th>`
   ).join('');
-
   const dateHtml=data.days.map((d,i)=>
     `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
       ${esc(d.dateText)}
       ${d.isoDate===data.today?'<span class="today-mark">今天</span>':''}
     </th>`
   ).join('');
-
   const timeHtml=data.days.map((d,i)=>
     `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
       ${d.time?esc(d.time).replace(/\n/g,'<br>'):'—'}
     </th>`
   ).join('');
-
+  const countHtml=data.days.map((d,i)=>{
+    const cls=d.remaining===0?'cnt-full':'cnt-open';
+    const tail=d.remaining===0?'已滿':'尚缺 '+d.remaining+' 人';
+    return `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
+      <span class="${cls}">${d.filled}/${d.capacity}　${tail}</span>
+    </th>`;
+  }).join('');
   const body=labels.map(label=>{
     const tds=data.days.map((d,i)=>{
       const p=(d.people||[]).find(x=>String(x.no)===String(label));
@@ -418,7 +443,6 @@ function buildTable(data){
     }).join('');
     return `<tr><th class="row-label">${esc(label)}</th>${tds}</tr>`;
   }).join('');
-
   const hasNotes=data.days.some(d=>d.notes&&d.notes.length);
   const notes=hasNotes?`
     <tr class="notes-row">
@@ -428,17 +452,16 @@ function buildTable(data){
           ${(d.notes||[]).map(esc).join('<br>')}
         </td>`).join('')}
     </tr>`:'';
-
   return `<table>
     <thead>
       <tr class="group-row"><th class="corner">小組</th>${groupHtml}</tr>
       <tr class="date-row"><th class="corner">日期</th>${dateHtml}</tr>
       <tr class="time-row"><th class="corner">時間</th>${timeHtml}</tr>
+      <tr class="count-row"><th class="corner">人數</th>${countHtml}</tr>
     </thead>
     <tbody>${body}${notes}</tbody>
   </table>`;
 }
-
 function groupSpans(days){
   const out=[];let start=0;
   while(start<days.length){
@@ -450,42 +473,19 @@ function groupSpans(days){
   }
   return out;
 }
-
 function groupStart(days,i){
   if(i<=0)return '';
   return (days[i].group||'')!==(days[i-1].group||'')?'group-start':'';
 }
 function todayClass(d,data){return d.isoDate===data.today?'today-col':''}
 
-function jumpToday(){
-  if(!currentData)return;
-  const i=currentData.days.findIndex(d=>d.isoDate===currentData.today);
-  if(i<0){alert('今天不在這次勤務日期範圍內。');return}
-  const target=document.querySelectorAll('.date-row .day-col')[i];
-  if(target)$('tableScroll').scrollTo({left:Math.max(0,target.offsetLeft-42),top:0,behavior:'smooth'});
-}
-
-function cell(rows,r,c){return String((rows[r]&&rows[r][c])??'')}
-function padSlice(arr,a,b){const o=[];for(let i=a;i<b;i++)o.push(String(arr[i]??''));return o}
-function toIso(text){
-  const m=String(text).match(/(\d{1,2})\/(\d{1,2})/);
-  return m?`2026-${String(+m[1]).padStart(2,'0')}-${String(+m[2]).padStart(2,'0')}`:'';
-}
-function todayIso(){
-  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
-  const o={};p.forEach(x=>o[x.type]=x.value);
-  return `${o.year}-${o.month}-${o.day}`;
-}
-function showError(err){
-  $('content').className='status';
-  $('content').innerHTML=
-    '<div class="error-title">目前無法讀取 Google 試算表</div>'+
-    '<div>請確認這份試算表仍保持「發布到網路」。</div>'+
-    '<div style="margin-top:6px;font-size:15px">'+esc(err?.message||String(err))+'</div>';
-}
-function esc(v){
-  return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-}
+/* ---------- 事件綁定 ---------- */
+$('btnRefresh').addEventListener('click',async()=>{
+  const b=$('btnRefresh');
+  b.disabled=true;setStatus('更新中…');
+  await refresh(true);
+  b.disabled=false;
+});
 </script>
 </body>
 </html>
