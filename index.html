@@ -50,6 +50,29 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .warnbar{margin:0 0 9px;padding:10px 12px;border:1px solid #e8c08f;background:#fff5e8;color:#7a4b1c;border-radius:11px;font-size:15px;font-weight:800;line-height:1.55}
 .warnbar[hidden]{display:none}
 
+/* 折疊區：報名流程與職司說明 */
+.folds{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin-bottom:10px}
+details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+details.fold>summary{list-style:none;cursor:pointer;padding:12px 15px;font-size:18px;font-weight:900;
+  color:#1c4c6d;background:linear-gradient(180deg,#eef6fc 0%,#d9e9f7 100%);display:flex;align-items:center;gap:9px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:'\25BE';margin-left:auto;font-size:15px;color:#4c7ea6;transition:transform .18s ease}
+details.fold[open]>summary::after{transform:rotate(180deg)}
+details.fold>summary:focus-visible{outline:3px solid var(--brand-dark);outline-offset:-3px}
+.fold-body{padding:12px 15px 14px}
+.rows{display:flex;flex-direction:column}
+.r{display:flex;gap:14px;padding:10px 8px;border-bottom:1px solid #dde7f0;border-radius:7px;
+  font-size:16.5px;line-height:1.62;color:#3f5262}
+.r:last-child{border-bottom:0}
+.r .d{flex:0 0 auto;white-space:nowrap;font-weight:900;color:var(--brand-dark);font-variant-numeric:tabular-nums}
+.r .d small{font-weight:700;color:var(--muted);font-size:13.5px}
+.r b{font-weight:900;color:var(--ink)}
+.r em{display:block;font-style:normal;font-size:14.5px;font-weight:800;color:#5c7183;margin-top:3px}
+.r.now{background:#dcecfa}
+.r.now .d::before{content:'\25B6 ';color:#2f6f9e}
+.foldnote{margin-top:11px;padding:10px 12px;background:#fff5e8;border-left:4px solid #d98a3d;
+  border-radius:0 8px 8px 0;color:#7a4b1c;font-weight:800;font-size:15px;line-height:1.65}
+
 /* 表格 */
 .shell{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
 .scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;max-height:none;overscroll-behavior:auto}
@@ -98,6 +121,10 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .toolbar{gap:8px}
   button{font-size:16px;padding:11px 13px}
   .hint{width:100%;margin-left:0;font-size:14px;line-height:1.5}
+  .folds{grid-template-columns:1fr;gap:8px}
+  details.fold>summary{font-size:17px;padding:12px 13px}
+  .fold-body{padding:11px 13px 13px}
+  .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
   .shell{border-radius:10px}
   .scroll{max-height:none}
   .corner,.row-label{position:static;width:52px;min-width:52px;max-width:52px;font-size:15px}
@@ -133,6 +160,39 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
     <span class="hint" id="updated">正在讀取…</span>
   </div>
   <div class="warnbar" id="warnbar" hidden></div>
+
+  <div class="folds">
+    <details class="fold">
+      <summary>📋 報名流程</summary>
+      <div class="fold-body">
+        <div class="rows" id="flowRows">
+          <div class="r"><span class="d">即日–9/13<small>(日)</small></span>
+            <span><b>第一階段：不記職司安排</b><em>先確認你可以參與哪幾天。不過夜的人請講清楚時間範圍。</em></span></div>
+          <div class="r"><span class="d">9/14–9/18<small>(五)</small></span>
+            <span><b>第二階段：劃分組別與職司</b><em>分配烹飪、維安、清潔。</em></span></div>
+          <div class="r"><span class="d">9/21<small>(一)</small></span>
+            <span><b>線上壇辦班，討論調整</b></span></div>
+          <div class="r"><span class="d">9/27–10/4</span>
+            <span><b>勤務執行</b><em>9/27 14:00 交接、10/4 早上至 14:00 交接。</em></span></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="fold">
+      <summary>🍳 職司與交接規則</summary>
+      <div class="fold-body">
+        <div class="rows">
+          <div class="r"><span class="d">🍳 烹飪</span>
+            <span>主要烹飪要<b>提早一天</b>到，與頭手溝通交接。<em>實際佔用：前一天 → 當天</em></span></div>
+          <div class="r"><span class="d">🛡️ 維安</span>
+            <span>要<b>睡一晚</b>，隔天執完早香、完成交接後才離開。<em>實際佔用：當天 → 隔天早香後</em></span></div>
+          <div class="r"><span class="d">🧹 清潔</span>
+            <span>沒有跨日的交接規則。<em>實際佔用：當天</em></span></div>
+        </div>
+        <div class="foldnote">⚠️ 所以實際佔用是 9/26～10/5：9/26 首日主要烹飪就要進場，10/5 早上最後一位維安才離開。排班時同一人可能表面沒撞、實際撞班。</div>
+      </div>
+    </details>
+  </div>
   <div class="shell">
     <div class="scroll" id="tableScroll">
       <div id="content" class="status">正在讀取勤務表…</div>
@@ -547,7 +607,16 @@ function groupStart(days,i){
 }
 function todayClass(d,data){return d.isoDate===data.today?'today-col':''}
 
+/* 折疊的流程表裡，把目前所在的階段標出來 */
+function markFlowNow(){
+  const cur=currentPhase();
+  const i=(CONFIG.PHASES||[]).indexOf(cur);
+  const rows=document.querySelectorAll('#flowRows .r');
+  for(let k=0;k<rows.length;k++) rows[k].classList.toggle('now',k===i);
+}
+
 /* ---------- 事件綁定 ---------- */
+markFlowNow();
 $('btnRefresh').addEventListener('click',async()=>{
   const b=$('btnRefresh');
   b.disabled=true;setStatus('更新中…');
