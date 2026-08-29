@@ -470,9 +470,9 @@ function buildTable(data){
   ).join('');
   const countHtml=data.days.map((d,i)=>{
     const cls=d.remaining===0?'cnt-full':'cnt-open';
-    const tail=d.remaining===0?'已滿':'尚缺 '+d.remaining+' 人';
+    const tail=d.remaining===0?'　已滿':'';
     return `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
-      <span class="${cls}">${d.filled}/${d.capacity}　${tail}</span>
+      <span class="${cls}">${d.filled}/${d.capacity}${tail}</span>
     </th>`;
   }).join('');
   const body=labels.map(label=>{
