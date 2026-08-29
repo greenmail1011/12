@@ -28,6 +28,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Pin
 .hero{background:linear-gradient(135deg,#b95f36 0%,#d97e4d 48%,#f0aa73 100%);color:#fff;padding:16px 14px}
 .hero-inner{max-width:1500px;margin:0 auto}
 h1{margin:0;font-size:clamp(30px,4.5vw,42px);line-height:1.2;text-shadow:0 1px 2px rgba(70,35,18,.28)}
+.phase{display:inline-block;margin-top:9px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.55);color:#fff;font-size:16px;font-weight:900;line-height:1.45}
+.phase[hidden]{display:none}
 .wrap{max-width:1500px;margin:0 auto;padding:10px 10px 22px}
 .toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:9px}
 button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 16px;border-radius:12px;font-weight:900;font-size:17px;cursor:pointer;font-family:inherit}
@@ -68,6 +70,7 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
   .notice-item{font-size:17px;line-height:1.55}
   .hero{padding:16px 12px 14px}
   h1{font-size:28px;line-height:1.25}
+  .phase{font-size:14px;padding:5px 11px;margin-top:8px}
   .wrap{padding:8px 6px 16px}
   .toolbar{gap:8px}
   button{font-size:16px;padding:11px 13px}
@@ -98,6 +101,7 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 <section class="hero">
   <div class="hero-inner">
     <h1 id="title">9/27(日)~10/4(日) 彌勒山12人小組</h1>
+    <div class="phase" id="phase" hidden></div>
   </div>
 </section>
 <main class="wrap">
@@ -124,7 +128,28 @@ const CONFIG = {
   // 沒有「設定」分頁就留空字串，避免每 30 秒多打一次註定失敗的請求。
   SETTINGS_GID:'',
   CHECK_MS:30000,
-  NOTICE:'請先確認可以參與的日期；若不過夜，請明確告知參與的時間範圍。'
+  NOTICE:'請先確認可以參與的日期；若不過夜，請明確告知參與的時間範圍。',
+  // 報名階段。until 是這個階段的最後一天（含）；最後一個階段的 until 設 null。
+  // 系統會依台北時間自動切換，不用手動改。
+  PHASES:[
+    {
+      until:'2026-09-06',
+      pill:'第一階段 · 即日起～9/6(日) · 尚未劃分組別',
+      texts:[
+        '【第一階段｜即日起～9/6(日)】先不劃分組別，請確認你可以參與哪幾天。',
+        '9/7 起進入第二階段，才會劃分職司：烹飪、維安、清潔。'
+      ]
+    },
+    {
+      until:null,
+      pill:'第二階段 · 9/7 起 · 劃分職司（烹飪／維安／清潔）',
+      texts:[
+        '【第二階段】職司劃分為：烹飪、維安、清潔。',
+        '🍳 烹飪：主要烹飪需「提早一天」到，與頭手溝通交接。',
+        '🛡️ 維安：需睡一晚，至隔天執完早香、完成交接後才能離開。'
+      ]
+    }
+  ]
 };
 
 let currentData=null;
@@ -158,6 +183,15 @@ function toIso(text){
   const m=String(text).match(/(\d{1,2})\/(\d{1,2})/);
   return m?`2026-${String(+m[1]).padStart(2,'0')}-${String(+m[2]).padStart(2,'0')}`:'';
 }
+// 依日期挑出目前階段。抽成純函式方便測試。
+function pickPhase(today){
+  const list=CONFIG.PHASES||[];
+  for(let i=0;i<list.length;i++){
+    if(!list[i].until || today<=list[i].until) return list[i];
+  }
+  return list[list.length-1]||null;
+}
+function currentPhase(){return pickPhase(todayIso())}
 function todayIso(){
   const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
   const o={};p.forEach(x=>o[x.type]=x.value);
@@ -348,10 +382,14 @@ function buildData(rows,settingsRows){
     const fallback=settings['上翻式公告']||CONFIG.NOTICE;
     if(fallback)announcementItems.push(fallback);
   }
+  // 階段公告永遠排在最前面。
+  const phase=currentPhase();
+  const phaseTexts=phase&&Array.isArray(phase.texts)?phase.texts:[];
   return {
     title,
     subtitle:settings['頁面副標題']||'9/27（日）～10/4（日）',
-    announcements:announcementItems,
+    announcements:phaseTexts.concat(announcementItems),
+    phasePill:phase?(phase.pill||''):'',
     rowLabels:labels,
     slots,
     target,
@@ -363,6 +401,9 @@ function buildData(rows,settingsRows){
 /* ---------- 畫面 ---------- */
 function render(data){
   $('title').textContent=data.title;
+  const pill=$('phase');
+  pill.textContent=data.phasePill||'';
+  pill.hidden=!data.phasePill;
   setupNotice(data.announcements);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
