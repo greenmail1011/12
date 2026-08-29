@@ -90,18 +90,29 @@ details.fold>summary:focus-visible{outline:3px solid var(--brand-dark);outline-o
   border-radius:0 8px 8px 0;color:#7a4b1c;font-weight:800;font-size:15px;line-height:1.65}
 
 /* 表格 */
-.shell{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
-.scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;max-height:none;overscroll-behavior:auto}
+.shell{position:relative;background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+/* 右緣漸層：還有沒看到的日期時才出現 */
+.shell::after{content:'';position:absolute;top:0;right:0;bottom:0;width:38px;pointer-events:none;z-index:6;
+  background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.55) 45%,rgba(198,220,238,.96) 100%);
+  opacity:0;transition:opacity .22s ease}
+.shell.more-right::after{opacity:1}
+.scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;
+  max-height:none;overscroll-behavior:auto;
+  scroll-snap-type:x proximity;scroll-padding-left:58px}
+/* 左右滑動吸附到整欄日期，不會停在半欄 */
+.date-row .day-col{scroll-snap-align:start}
+/* 左右滑時編號欄固定在最左邊 */
+.corner,.row-label{position:sticky;left:0;z-index:2}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed;background:#fff}
 th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
 tr>*:last-child{border-right:0}
 tbody tr:last-child>*{border-bottom:0}
-.corner,.row-label{position:static;width:58px;min-width:58px;max-width:58px;background:#e6eff7;font-weight:900}
-.group-row th{position:static;height:44px;padding:7px 8px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);color:#1c4c6d;font-size:16px;font-weight:900;vertical-align:middle}
-.date-row th{position:static;height:64px;padding:7px 8px;background:linear-gradient(180deg,#f8fbfe 0%,#e0eef9 100%);font-size:23px;font-weight:900;white-space:nowrap;vertical-align:middle}
-.time-row th{position:static;height:88px;padding:8px 7px;background:#f9fcfe;color:#2c6b96;font-size:16px;line-height:1.55;font-weight:900;white-space:normal;overflow:visible;vertical-align:middle}
+.corner,.row-label{width:58px;min-width:58px;max-width:58px;background:#e6eff7;font-weight:900}
+.group-row th{height:44px;padding:7px 8px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);color:#1c4c6d;font-size:16px;font-weight:900;vertical-align:middle}
+.date-row th{height:64px;padding:7px 8px;background:linear-gradient(180deg,#f8fbfe 0%,#e0eef9 100%);font-size:23px;font-weight:900;white-space:nowrap;vertical-align:middle}
+.time-row th{height:88px;padding:8px 7px;background:#f9fcfe;color:#2c6b96;font-size:16px;line-height:1.55;font-weight:900;white-space:normal;overflow:visible;vertical-align:middle}
 .time-row .corner{color:var(--ink)}
-.count-row th{position:static;height:46px;padding:6px 8px;background:#f3f9fd;font-size:16px;font-weight:900;white-space:nowrap;vertical-align:middle}
+.count-row th{height:46px;padding:6px 8px;background:#f3f9fd;font-size:16px;font-weight:900;white-space:nowrap;vertical-align:middle}
 .count-row .corner{color:var(--ink);font-size:15px}
 .cnt{color:#3a5266}
 .cnt-zero{color:#a9bcca}
@@ -141,8 +152,10 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .fold-body{padding:11px 13px 13px}
   .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
   .shell{border-radius:10px}
+  .shell::after{width:30px}
   .scroll{max-height:none}
-  .corner,.row-label{position:static;width:52px;min-width:52px;max-width:52px;font-size:15px}
+  .corner,.row-label{width:52px;min-width:52px;max-width:52px;font-size:15px}
+  .scroll{scroll-padding-left:52px}
   .day-col{width:154px;min-width:154px;max-width:154px}
   .group-row th{height:42px;padding:6px 4px;font-size:15px}
   .date-row th{height:60px;padding:7px 5px;font-size:21px}
@@ -432,6 +445,7 @@ function buildData(rows){
 function render(data){
   $('content').className='';
   $('content').innerHTML=buildTable(data);
+  updateScrollHint();
 }
 function buildTable(data){
   if(!data.days.length)return '<div class="status">目前沒有勤務資料。</div>';
@@ -523,7 +537,17 @@ function markFlowNow(){
   }
 }
 
+/* 表格右邊還有沒看到的日期時，顯示右緣漸層 */
+function updateScrollHint(){
+  const sc=$('tableScroll');
+  if(!sc||!sc.parentElement)return;
+  const more=sc.scrollWidth-sc.clientWidth-sc.scrollLeft>4;
+  sc.parentElement.classList.toggle('more-right',more);
+}
+
 /* ---------- 事件綁定 ---------- */
+$('tableScroll').addEventListener('scroll',updateScrollHint,{passive:true});
+window.addEventListener('resize',updateScrollHint);
 renderSteps();
 markFlowNow();
 $('btnRefresh').addEventListener('click',async()=>{
