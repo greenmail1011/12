@@ -11,7 +11,6 @@
 :root{
   --bg:#eef4f9;--ink:#152633;--muted:#54697c;--line:#c2d4e2;
   --brand:#8fc0e2;--brand-dark:#2f6f9e;--brand-soft:#e8f2fa;
-  --notice-line:#a8cbe6;--notice-ink:#1f4e6d;
   --today:#dcecfa;--today-head:#a6d0f0;
   --stripe:#e4eef7;
   --shadow:0 10px 28px rgba(24,58,84,.10)
@@ -20,22 +19,13 @@
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
 
-/* 跑馬燈公告 */
-.notice{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:11px;min-height:60px;padding:8px 12px;background:linear-gradient(90deg,#f2f8fd 0%,#ddedfa 48%,#c9e2f5 100%);border-bottom:1px solid var(--notice-line);color:var(--notice-ink)}
-.notice-icon{font-size:21px;flex:0 0 auto}
-.notice-window{position:relative;height:42px;flex:1;overflow:hidden}
-.marquee{position:absolute;top:0;left:0;height:100%;display:flex;align-items:center;
-  white-space:nowrap;font-size:18px;font-weight:900;line-height:1.5;will-change:transform}
-.marquee.run{animation:mq linear infinite}
-@keyframes mq{from{transform:translateX(var(--start,100%))}to{transform:translateX(-100%)}}
-.mq-sep{opacity:.45;padding:0 26px}
-
 /* Banner */
 /* 預設（窄螢幕）：照片在上、文字在下，字絕不會蓋到建築 */
 .hero{position:relative;color:#fff;background:linear-gradient(135deg,#2b6b99 0%,#4e93c4 48%,#86bade 100%)}
 .hero-photo{height:clamp(125px,27vw,210px);background:url('banner.jpg') center 44%/cover no-repeat}
 .hero-inner{max-width:1500px;margin:0 auto;padding:14px 14px 16px}
-h1{margin:0;font-size:clamp(27px,4.5vw,42px);line-height:1.22;text-shadow:0 1px 3px rgba(4,20,34,.3)}
+h1{margin:0;font-size:clamp(27px,4.5vw,42px);line-height:1.24;text-shadow:0 1px 3px rgba(4,20,34,.3)}
+h1 .t-date,h1 .t-name{display:block}
 /* 寬螢幕：高度夠了才把文字疊回照片上，並讓文字落在前方步道、不壓到建築 */
 @media(min-width:1080px){
   .hero{display:flex;align-items:flex-end;overflow:hidden;min-height:calc(13.5vw + 160px)}
@@ -133,17 +123,7 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
 .error-title{font-weight:900;color:#8f3f34;margin-bottom:7px}
 .footer{padding:9px 6px 0;text-align:center;color:var(--muted);font-size:15px;line-height:1.6}
 
-/* 使用者若在系統關閉動態效果，就不捲動，改成一般換行顯示 */
-@media (prefers-reduced-motion:reduce){
-  .marquee{position:static;animation:none!important;transform:none!important;white-space:normal;height:auto}
-  .notice-window{height:auto}
-  .notice{min-height:0}
-}
 @media(max-width:640px){
-  .notice{min-height:56px;padding:8px 10px;gap:9px}
-  .notice-window{height:40px}
-  .marquee{font-size:17px}
-  .mq-sep{padding:0 20px}
   .hero-inner{padding:13px 12px 15px}
   .hero-inner{padding:14px 12px 14px}
   h1{font-size:26px;line-height:1.25}
@@ -176,16 +156,10 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
 </style>
 </head>
 <body>
-<div class="notice" id="notice" hidden>
-  <div class="notice-icon">🔔</div>
-  <div class="notice-window">
-    <div class="marquee" id="marquee"></div>
-  </div>
-</div>
 <section class="hero">
   <div class="hero-photo"></div>
   <div class="hero-inner">
-    <h1 id="title">9/27(日)~10/4(日) 彌勒山12人小組</h1>
+    <h1><span class="t-date">9/27(日)~10/4(日)</span><span class="t-name">教定區｜彌勒山12人小組</span></h1>
     <div class="steps" id="steps" hidden></div>
   </div>
 </section>
@@ -210,9 +184,7 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
             <span><b>第二階段：劃分組別與職司</b><em>分配烹飪、維安、清潔。</em></span></div>
           <div class="r" data-p="2"><span class="d">9/21<small>(一)</small></span>
             <span><b>線上壇辦班，職司調整</b></span></div>
-          <div class="r" data-p="3"><span class="d">9/24<small>(四)</small></span>
-            <span><b>線上討論，最後調整</b></span></div>
-          <div class="r" data-p="4"><span class="d">9/27–10/4</span>
+          <div class="r" data-p="3"><span class="d">9/27–10/4</span>
             <span><b>12人小組輪值</b><em>9/27 14:00 交接、10/4 早上至 14:00 交接。</em></span></div>
         </div>
       </div>
@@ -245,60 +217,20 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
 const CONFIG = {
   SPREADSHEET_ID:'1GEE-2ISgzqAca-SblK2SSu8e7a_rlwyrkjH73wiHiW4',
   DATA_GID:'303688467',
-  // 沒有「設定」分頁就留空字串，避免每 30 秒多打一次註定失敗的請求。
-  SETTINGS_GID:'',
   CHECK_MS:30000,
-  NOTICE:'請先確認你可以報名哪幾天、大概幾點到幾點（直接洽區中心報名）。',
   // 報名階段。until 是這個階段的最後一天（含）；最後一個階段的 until 設 null。
   // 系統會依台北時間自動切換，不用手動改。
   PHASES:[
-    {
-      until:'2026-09-13',
-      lb:'① 不記職司安排',      wh:'即日起～9/13',
-      texts:[
-        '請先確認你可以報名哪幾天、大概幾點到幾點（直接洽區中心報名）',
-        '職司 9/14 之後才分，9/21 線上壇辦班職司調整、9/24 線上討論最後調整，不會直接指派。'
-      ]
-    },
-    {
-      until:'2026-09-18',
-      lb:'② 劃分組別與職司',     wh:'9/14～9/18',
-      texts:[
-        '9/14～9/18 劃分組別與職司。',
-        '9/21(一) 線上壇辦班職司調整；9/24(四) 線上討論最後調整。'
-      ]
-    },
-    {
-      until:'2026-09-21',
-      lb:'③ 線上壇辦班職司調整', wh:'9/21(一)',
-      texts:[
-        '9/21(一) 線上壇辦班，職司調整。',
-        '9/24(四) 還有一場線上討論，做最後調整。'
-      ]
-    },
-    {
-      until:'2026-09-24',
-      lb:'④ 線上討論最後調整',   wh:'9/24(四)',
-      texts:[
-        '9/24(四) 線上討論，最後調整。'
-      ]
-    },
-    {
-      until:null,
-      lb:'⑤ 12人小組輪值',      wh:'9/27～10/4',
-      texts:[
-        '9/27(日)～10/4(日) 12人小組輪值，請依班表報到。'
-      ]
-    }
+    { until:'2026-09-13', lb:'① 不記職司安排',      wh:'即日起～9/13' },
+    { until:'2026-09-18', lb:'② 劃分組別與職司',     wh:'9/14～9/18' },
+    { until:'2026-09-21', lb:'③ 線上壇辦班職司調整', wh:'9/21(一)' },
+    { until:null,         lb:'④ 12人小組輪值',      wh:'9/27～10/4' }
   ]
 };
 
 let currentData=null;
 let currentHash='';
 let timer=null;
-let noticeMessages=[];
-let marqueeTimer=null;
-const MARQUEE_SPEED=105;   // 捲動速度（每秒像素）；想慢一點就把數字調小
 let querySerial=0;
 
 const $=id=>document.getElementById(id);
@@ -398,15 +330,7 @@ async function refresh(force){
   clearTimeout(timer);
   try{
     const dataRows=await runQuery(CONFIG.DATA_GID,'A1:I100');
-    let settingsRows=[];
-    if(CONFIG.SETTINGS_GID){
-      try{
-        settingsRows=await runQuery(CONFIG.SETTINGS_GID,'A1:B30');
-      }catch(_){
-        // 設定頁抓不到不影響勤務表，公告使用預設文字。
-      }
-    }
-    const data=buildData(dataRows,settingsRows);
+    const data=buildData(dataRows);
     const hash=JSON.stringify(data);
     if(force || hash!==currentHash){
       currentHash=hash;
@@ -447,9 +371,8 @@ function showError(err){
 }
 
 /* ---------- 整理資料 ---------- */
-function buildData(rows,settingsRows){
+function buildData(rows){
   if(!rows || rows.length<4) throw new Error('Google 試算表沒有回傳完整勤務資料');
-  const title=cell(rows,0,0)||'彌勒山12人小組勤務安排';
   const groupRow=padSlice(rows[1]||[],1,9);
   const dateRow=padSlice(rows[2]||[],1,9);
   const timeRow=padSlice(rows[3]||[],1,9);
@@ -498,33 +421,7 @@ function buildData(rows,settingsRows){
       filled:people.length
     });
   }
-  const settings={};
-  const announcementItems=[];
-  settingsRows.forEach((r,i)=>{
-    if(i===0)return;
-    const k=String(r[0]||'').trim();
-    const v=String(r[1]||'').trim();
-    if(!k)return;
-    settings[k]=v;
-    // A欄只要是「跑馬燈公告」「跑馬燈公告1」「跑馬燈公告2」……
-    // B欄就視為一則完整公告；同一格內容不會再被拆開。
-    if(/^跑馬燈公告(?:\d+)?$/.test(k) && v){
-      announcementItems.push(v);
-    }
-  });
-  // 階段公告永遠排在最前面。
-  const phase=currentPhase();
-  const phaseTexts=phase&&Array.isArray(phase.texts)?phase.texts:[];
-  // 只有在階段公告與設定分頁都沒東西時，才用預設文字墊檔，
-  // 否則會和階段公告講一樣的話（跑馬燈看起來像跳針）。
-  if(!announcementItems.length && !phaseTexts.length){
-    const fallback=settings['上翻式公告']||CONFIG.NOTICE;
-    if(fallback)announcementItems.push(fallback);
-  }
   return {
-    title,
-    subtitle:settings['頁面副標題']||'9/27（日）～10/4（日）',
-    announcements:phaseTexts.concat(announcementItems),
     rowLabels:labels,
     days,
     today:todayIso()
@@ -533,45 +430,8 @@ function buildData(rows,settingsRows){
 
 /* ---------- 畫面 ---------- */
 function render(data){
-  $('title').textContent=data.title;
-  setupNotice(data.announcements);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
-}
-function normalizeNoticeText(text){
-  // 同一個設定欄位視為「一則完整公告」，不依標點或換行拆開。
-  return String(text || '').trim();
-}
-function setupNotice(items){
-  const box=$('marquee');
-  noticeMessages=(Array.isArray(items)?items:[items])
-    .map(s=>normalizeNoticeText(s))
-    .filter(Boolean);
-  if(!box)return;
-  if(!noticeMessages.length){ $('notice').hidden=true; return; }
-  $('notice').hidden=false;
-  // 多則公告串成一條，中間用分隔符號隔開，跑完再從右邊接回來。
-  box.classList.remove('run');
-  box.style.animation='';
-  box.innerHTML=noticeMessages.map(esc).join('<span class="mq-sep">◆</span>');
-  startMarquee();
-}
-/* 由右往左捲動；速度固定，字多就跑久一點。 */
-function startMarquee(){
-  const box=$('marquee');
-  if(!box)return;
-  const win=box.parentElement;
-  box.classList.remove('run');
-  if(reducedMotion())return;                 // 系統關閉動態效果就不捲
-  const w=win.clientWidth, t=box.scrollWidth;
-  if(!w||!t)return;
-  box.style.setProperty('--start',w+'px');
-  box.style.animationDuration=Math.max(8,(w+t)/MARQUEE_SPEED).toFixed(1)+'s';
-  void box.offsetWidth;                       // 強制重排，動畫才會從頭跑
-  box.classList.add('run');
-}
-function reducedMotion(){
-  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 function buildTable(data){
   if(!data.days.length)return '<div class="status">目前沒有勤務資料。</div>';
@@ -656,20 +516,12 @@ function renderSteps(){
 function markFlowNow(){
   const cur=currentPhase();
   const i=(CONFIG.PHASES||[]).indexOf(cur);
-  // 用 data-p 對應階段，不能用列的順序 —— 9/21 和 9/24 同屬階段 ③，列數比階段多。
+  // 用 data-p 對應階段，不要用列的順序 —— 之後若某個階段拆成多列，順序就會錯位。
   const rows=document.querySelectorAll('#flowRows .r');
   for(let k=0;k<rows.length;k++){
     rows[k].classList.toggle('now', i>=0 && rows[k].dataset.p===String(i));
   }
 }
-
-/* 視窗寬度變了，跑馬燈長度要重算 */
-window.addEventListener('resize',()=>{
-  clearTimeout(marqueeTimer);
-  marqueeTimer=setTimeout(startMarquee,220);
-});
-/* 字型載入完成後寬度會變，重新量一次 */
-if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>startMarquee());}
 
 /* ---------- 事件綁定 ---------- */
 renderSteps();
