@@ -62,8 +62,8 @@ h1 .t-date,h1 .t-name{display:block}
 .warnbar{margin:0 0 9px;padding:10px 12px;border:1px solid #e8c08f;background:#fff5e8;color:#7a4b1c;border-radius:11px;font-size:15px;font-weight:800;line-height:1.55}
 .warnbar[hidden]{display:none}
 
-/* 折疊區：報名流程與職司說明 */
-.folds{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin-bottom:10px}
+/* 折疊區：職司說明 */
+.folds{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;margin-bottom:10px}
 details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 details.fold>summary{list-style:none;cursor:pointer;padding:12px 15px;font-size:18px;font-weight:900;
   color:#1c4c6d;background:linear-gradient(180deg,#eef6fc 0%,#d9e9f7 100%);display:flex;align-items:center;gap:9px}
@@ -82,32 +82,6 @@ details.fold>summary:focus-visible{outline:3px solid var(--brand-dark);outline-o
 .r em{display:block;font-style:normal;font-size:14.5px;font-weight:800;color:#5c7183;margin-top:3px}
 .r.now{background:#dcecfa}
 .r.now .d::before{content:'\25B6 ';color:#2f6f9e}
-/* 報名流程圖：方塊＋箭頭，一眼看得出先後順序 */
-.flowchart{display:flex;flex-direction:column;align-items:stretch}
-.fc-node{position:relative;border:1.5px solid var(--line);border-radius:11px;background:#fff;
-  padding:11px 13px 12px}
-.fc-node.now{border-color:var(--brand-dark);background:#dcecfa;
-  box-shadow:0 0 0 3px rgba(47,111,158,.16)}
-.fc-head{display:flex;align-items:center;gap:9px;margin-bottom:5px}
-.fc-n{flex:0 0 auto;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;
-  background:var(--brand-dark);color:#fff;font-size:14px;font-weight:900;line-height:1}
-.fc-node.now .fc-n{background:#1c4c6d}
-.fc-d{font-size:16px;font-weight:900;color:var(--brand-dark);font-variant-numeric:tabular-nums}
-.fc-d small{font-weight:700;color:var(--muted);font-size:13px}
-.fc-t{display:block;font-size:18px;font-weight:900;color:var(--ink);line-height:1.45}
-.fc-m{display:block;font-style:normal;font-size:15px;font-weight:700;color:#5c7183;
-  margin-top:5px;line-height:1.65}
-/* 連接箭頭 */
-.fc-arrow{position:relative;height:26px;flex:0 0 auto}
-.fc-arrow::before{content:'';position:absolute;left:26px;top:-1px;bottom:9px;width:2.5px;
-  background:#9cc0dc;border-radius:2px}
-.fc-arrow::after{content:'';position:absolute;left:22px;bottom:4px;width:9px;height:9px;
-  border-right:2.5px solid #9cc0dc;border-bottom:2.5px solid #9cc0dc;transform:rotate(45deg)}
-.opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-.opt{border:1px solid #b9d3e8;background:var(--brand-soft);color:var(--brand-dark);
-  border-radius:999px;padding:4px 12px;font-size:14.5px;font-weight:800;line-height:1.6;white-space:nowrap}
-.foldnote{margin-top:11px;padding:10px 12px;background:#fff5e8;border-left:4px solid #d98a3d;
-  border-radius:0 8px 8px 0;color:#7a4b1c;font-weight:800;font-size:15px;line-height:1.65}
 
 /* 報名按鈕：整頁最醒目的一顆，金色底＋光帶掃過的金光閃閃效果 */
 .signup{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;
@@ -201,17 +175,10 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .step .wh{font-size:12.5px}
   .wrap{padding:8px 6px 104px}   /* 底部留白，內容才不會被固定的報名鈕蓋住 */
   .hint{width:100%;margin-left:0;font-size:14px;line-height:1.5}
-  .folds{grid-template-columns:1fr;gap:8px}
+  .folds{gap:8px}
   details.fold>summary{font-size:17px;padding:12px 13px}
   .fold-body{padding:11px 13px 13px}
   .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
-  .fc-node{padding:10px 11px 11px}
-  .fc-t{font-size:17px}
-  .fc-m{font-size:14px}
-  .fc-d{font-size:15px}
-  .fc-arrow{height:22px}
-  .fc-arrow::before{left:22px;bottom:8px}
-  .fc-arrow::after{left:18px}
   .shell{border-radius:10px}
   .shell::after{width:30px}
   /* 手機：報名鈕固定浮在畫面底部，捲動時一直看得到 */
@@ -265,37 +232,6 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
 
   <div class="folds">
     <details class="fold">
-      <summary>📋 報名流程</summary>
-      <div class="fold-body">
-        <div class="flowchart" id="flowRows">
-          <div class="fc-node" data-p="0">
-            <span class="fc-head"><span class="fc-n">1</span><span class="fc-d">即日–9/13<small>(日)</small></span></span>
-            <b class="fc-t">向區中心報名了愿日期</b>
-            <em class="fc-m">職司 9/14 之後才分，大家一起討論認領，會照每個人方便的時間安排，不會直接指派。</em>
-            <div class="opts"><span class="opt">全天＋過夜</span><span class="opt">全天，當天回</span><span class="opt">只有白天（＿點～＿點）</span></div>
-          </div>
-          <div class="fc-arrow" aria-hidden="true"></div>
-          <div class="fc-node" data-p="1">
-            <span class="fc-head"><span class="fc-n">2</span><span class="fc-d">9/14–9/18<small>(五)</small></span></span>
-            <b class="fc-t">職司初安排</b>
-            <em class="fc-m">分配烹飪、維安、清潔。</em>
-          </div>
-          <div class="fc-arrow" aria-hidden="true"></div>
-          <div class="fc-node" data-p="2">
-            <span class="fc-head"><span class="fc-n">3</span><span class="fc-d">9/21<small>(一)</small></span></span>
-            <b class="fc-t">線上壇辦班，職司最後調整</b>
-          </div>
-          <div class="fc-arrow" aria-hidden="true"></div>
-          <div class="fc-node" data-p="3">
-            <span class="fc-head"><span class="fc-n">4</span><span class="fc-d">9/27–10/4</span></span>
-            <b class="fc-t">12人小組輪值</b>
-            <em class="fc-m">9/27 14:00 交接、10/4 早上至 14:00 交接。</em>
-          </div>
-        </div>
-      </div>
-    </details>
-
-    <details class="fold">
       <summary>🍳 職司與交接規則</summary>
       <div class="fold-body">
         <div class="rows">
@@ -306,7 +242,6 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
           <div class="r"><span class="d">🧹 清潔</span>
             <span>沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
         </div>
-        <div class="foldnote">⚠️ 要讓職司完整不空窗，前後各要多一天：9/26 晚上首日主要烹飪就要到，10/5 早上最後一位維安才離開。排班時同一人可能表面沒撞、實際撞班。</div>
       </div>
     </details>
   </div>
@@ -623,18 +558,8 @@ function renderSteps(){
   box.hidden=false;
 }
 
-/* 折疊的流程表裡，把目前所在的階段標出來 */
-function markFlowNow(){
-  const cur=currentPhase();
-  const i=(CONFIG.PHASES||[]).indexOf(cur);
-  // 用 data-p 對應階段，不要用列的順序 —— 之後若某個階段拆成多列，順序就會錯位。
-  const rows=document.querySelectorAll('#flowRows .fc-node');
-  for(let k=0;k<rows.length;k++){
-    rows[k].classList.toggle('now', i>=0 && rows[k].dataset.p===String(i));
-  }
-}
-
-/* 表格右邊還有沒看到的日期時，顯示右緣漸層 */
+let swipedOnce=false;   // 使用者左右滑過一次之後，提示就不再出現
+/* 表格右邊還有沒看到的日期時顯示右緣漸層；滑過一次就把提示收起來 */
 function updateScrollHint(){
   const sc=$('tableScroll');
   if(!sc||!sc.parentElement)return;
@@ -646,14 +571,12 @@ function updateScrollHint(){
 }
 
 /* ---------- 事件綁定 ---------- */
-let swipedOnce=false;   // 使用者左右滑過一次之後，提示就不再出現
 $('tableScroll').addEventListener('scroll',()=>{
   if($('tableScroll').scrollLeft>8)swipedOnce=true;
   updateScrollHint();
 },{passive:true});
 window.addEventListener('resize',updateScrollHint);
 renderSteps();
-markFlowNow();
 </script>
 </body>
 </html>
