@@ -36,8 +36,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Pin
 .hero::after{background:linear-gradient(180deg,rgba(6,26,43,0) 0%,rgba(6,26,43,.05) 30%,rgba(6,26,43,.52) 62%,rgba(6,26,43,.86) 100%)}
 .hero-inner{position:relative;z-index:1;width:100%;max-width:1500px;margin:0 auto;padding:18px 14px 16px}
 h1{margin:0;font-size:clamp(27px,4.5vw,42px);line-height:1.22;text-shadow:0 2px 12px rgba(4,20,34,.75),0 1px 3px rgba(4,20,34,.6)}
-.phase{display:inline-block;margin-top:10px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.6);color:#fff;font-size:16px;font-weight:900;line-height:1.45;text-shadow:0 1px 5px rgba(4,20,34,.55)}
-.phase[hidden]{display:none}
+.steps{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.steps[hidden]{display:none}
+.step{display:flex;align-items:baseline;gap:8px;padding:6px 13px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.45);background:rgba(10,32,50,.34);color:#fff;
+  line-height:1.5;text-shadow:0 1px 4px rgba(4,20,34,.55);opacity:.88}
+.step .lb{font-size:15.5px;font-weight:900;white-space:nowrap}
+.step .wh{font-size:13px;font-weight:700;opacity:.92;white-space:nowrap}
+.step.on{background:#fff;border-color:#fff;color:#11486d;opacity:1;text-shadow:none;
+  box-shadow:0 3px 14px rgba(4,20,34,.32)}
+.step.on .wh{color:#2f6f9e;opacity:1}
 
 /* 工具列 */
 .wrap{max-width:1500px;margin:0 auto;padding:10px 10px 22px}
@@ -116,7 +124,11 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .hero::after{background:linear-gradient(180deg,rgba(6,26,43,0) 0%,rgba(6,26,43,.10) 24%,rgba(6,26,43,.60) 50%,rgba(6,26,43,.88) 100%)}
   .hero-inner{padding:14px 12px 14px}
   h1{font-size:26px;line-height:1.25}
-  .phase{font-size:14px;padding:5px 11px;margin-top:8px}
+  /* 手機：四顆排成兩欄兩列，文字上下疊，比擠成三行整齊 */
+  .steps{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .step{flex-direction:column;align-items:flex-start;gap:1px;padding:7px 11px}
+  .step .lb{font-size:14px;white-space:normal;line-height:1.4}
+  .step .wh{font-size:12px}
   .wrap{padding:8px 6px 16px}
   .toolbar{gap:8px}
   button{font-size:16px;padding:11px 13px}
@@ -151,7 +163,7 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
 <section class="hero">
   <div class="hero-inner">
     <h1 id="title">9/27(日)~10/4(日) 彌勒山12人小組</h1>
-    <div class="phase" id="phase" hidden></div>
+    <div class="steps" id="steps" hidden></div>
   </div>
 </section>
 <main class="wrap">
@@ -171,9 +183,9 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
           <div class="r"><span class="d">9/14–9/18<small>(五)</small></span>
             <span><b>第二階段：劃分組別與職司</b><em>分配烹飪、維安、清潔。</em></span></div>
           <div class="r"><span class="d">9/21<small>(一)</small></span>
-            <span><b>線上壇辦班，討論調整</b></span></div>
+            <span><b>線上壇辦班職司調整討論</b></span></div>
           <div class="r"><span class="d">9/27–10/4</span>
-            <span><b>勤務執行</b><em>9/27 14:00 交接、10/4 早上至 14:00 交接。</em></span></div>
+            <span><b>12人小組輪值</b><em>9/27 14:00 交接、10/4 早上至 14:00 交接。</em></span></div>
         </div>
       </div>
     </details>
@@ -214,35 +226,32 @@ const CONFIG = {
   PHASES:[
     {
       until:'2026-09-13',
-      pill:'第一階段 · 即日起～9/13(日) · 不記職司安排',
+      lb:'① 不記職司安排',  wh:'即日起～9/13',
       texts:[
-        '【第一階段｜即日起～9/13(日)】不記職司安排，請先確認你可以參與哪幾天。',
-        '9/14～9/18 進入第二階段劃分組別與職司；9/21(一) 線上壇辦班討論調整。'
+        '請先確認你可以參與哪幾天；若不過夜，請明確告知參與的時間範圍。'
       ]
     },
     {
       until:'2026-09-18',
-      pill:'第二階段 · 9/14～9/18 · 劃分組別與職司',
+      lb:'② 劃分組別與職司', wh:'9/14～9/18',
       texts:[
-        '【第二階段｜9/14～9/18】劃分組別，並分配職司：烹飪、維安、清潔。',
         '🍳 烹飪：主要烹飪需「提早一天」到，與頭手溝通交接。',
         '🛡️ 維安：需睡一晚，至隔天執完早香、完成交接後才能離開。'
       ]
     },
     {
       until:'2026-09-21',
-      pill:'9/21(一) 線上壇辦班 · 討論調整',
+      lb:'③ 線上壇辦班職司調整討論', wh:'9/21(一)',
       texts:[
-        '【9/21(一)】線上壇辦班，討論並調整職司安排。',
+        '9/21(一) 線上壇辦班，職司調整討論。',
         '🍳 烹飪：主要烹飪需「提早一天」到，與頭手溝通交接。',
         '🛡️ 維安：需睡一晚，至隔天執完早香、完成交接後才能離開。'
       ]
     },
     {
       until:null,
-      pill:'9/27(日)～10/4(日) 勤務期間',
+      lb:'④ 12人小組輪值',   wh:'9/27～10/4',
       texts:[
-        '職司安排已確定，請依班表報到。',
         '🍳 烹飪：主要烹飪需「提早一天」到，與頭手溝通交接。',
         '🛡️ 維安：需睡一晚，至隔天執完早香、完成交接後才能離開。'
       ]
@@ -469,18 +478,19 @@ function buildData(rows,settingsRows){
       announcementItems.push(v);
     }
   });
-  if(!announcementItems.length){
-    const fallback=settings['上翻式公告']||CONFIG.NOTICE;
-    if(fallback)announcementItems.push(fallback);
-  }
   // 階段公告永遠排在最前面。
   const phase=currentPhase();
   const phaseTexts=phase&&Array.isArray(phase.texts)?phase.texts:[];
+  // 只有在階段公告與設定分頁都沒東西時，才用預設文字墊檔，
+  // 否則會和階段公告講一樣的話（跑馬燈看起來像跳針）。
+  if(!announcementItems.length && !phaseTexts.length){
+    const fallback=settings['上翻式公告']||CONFIG.NOTICE;
+    if(fallback)announcementItems.push(fallback);
+  }
   return {
     title,
     subtitle:settings['頁面副標題']||'9/27（日）～10/4（日）',
     announcements:phaseTexts.concat(announcementItems),
-    phasePill:phase?(phase.pill||''):'',
     rowLabels:labels,
     days,
     today:todayIso()
@@ -490,9 +500,6 @@ function buildData(rows,settingsRows){
 /* ---------- 畫面 ---------- */
 function render(data){
   $('title').textContent=data.title;
-  const pill=$('phase');
-  pill.textContent=data.phasePill||'';
-  pill.hidden=!data.phasePill;
   setupNotice(data.announcements);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
@@ -607,6 +614,17 @@ function groupStart(days,i){
 }
 function todayClass(d,data){return d.isoDate===data.today?'today-col':''}
 
+/* 標題下方的四個階段：目前所在的那一個會反白 */
+function renderSteps(){
+  const box=$('steps'), list=CONFIG.PHASES||[];
+  if(!box||!list.length)return;
+  const cur=currentPhase();
+  box.innerHTML=list.map(p=>
+    `<span class="step${p===cur?' on':''}"><span class="lb">${esc(p.lb||'')}</span><span class="wh">${esc(p.wh||'')}</span></span>`
+  ).join('');
+  box.hidden=false;
+}
+
 /* 折疊的流程表裡，把目前所在的階段標出來 */
 function markFlowNow(){
   const cur=currentPhase();
@@ -616,6 +634,7 @@ function markFlowNow(){
 }
 
 /* ---------- 事件綁定 ---------- */
+renderSteps();
 markFlowNow();
 $('btnRefresh').addEventListener('click',async()=>{
   const b=$('btnRefresh');
