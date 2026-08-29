@@ -82,6 +82,27 @@ details.fold>summary:focus-visible{outline:3px solid var(--brand-dark);outline-o
 .r em{display:block;font-style:normal;font-size:14.5px;font-weight:800;color:#5c7183;margin-top:3px}
 .r.now{background:#dcecfa}
 .r.now .d::before{content:'\25B6 ';color:#2f6f9e}
+/* 報名流程圖：方塊＋箭頭，一眼看得出先後順序 */
+.flowchart{display:flex;flex-direction:column;align-items:stretch}
+.fc-node{position:relative;border:1.5px solid var(--line);border-radius:11px;background:#fff;
+  padding:11px 13px 12px}
+.fc-node.now{border-color:var(--brand-dark);background:#dcecfa;
+  box-shadow:0 0 0 3px rgba(47,111,158,.16)}
+.fc-head{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.fc-n{flex:0 0 auto;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;
+  background:var(--brand-dark);color:#fff;font-size:14px;font-weight:900;line-height:1}
+.fc-node.now .fc-n{background:#1c4c6d}
+.fc-d{font-size:16px;font-weight:900;color:var(--brand-dark);font-variant-numeric:tabular-nums}
+.fc-d small{font-weight:700;color:var(--muted);font-size:13px}
+.fc-t{display:block;font-size:18px;font-weight:900;color:var(--ink);line-height:1.45}
+.fc-m{display:block;font-style:normal;font-size:15px;font-weight:700;color:#5c7183;
+  margin-top:5px;line-height:1.65}
+/* 連接箭頭 */
+.fc-arrow{position:relative;height:26px;flex:0 0 auto}
+.fc-arrow::before{content:'';position:absolute;left:26px;top:-1px;bottom:9px;width:2.5px;
+  background:#9cc0dc;border-radius:2px}
+.fc-arrow::after{content:'';position:absolute;left:22px;bottom:4px;width:9px;height:9px;
+  border-right:2.5px solid #9cc0dc;border-bottom:2.5px solid #9cc0dc;transform:rotate(45deg)}
 .opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .opt{border:1px solid #b9d3e8;background:var(--brand-soft);color:var(--brand-dark);
   border-radius:999px;padding:4px 12px;font-size:14.5px;font-weight:800;line-height:1.6;white-space:nowrap}
@@ -142,7 +163,7 @@ th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);tex
 tr>*:last-child{border-right:0}
 tbody tr:last-child>*{border-bottom:0}
 .corner,.row-label{width:58px;min-width:58px;max-width:58px;background:#e6eff7;font-weight:900}
-.group-row th{height:44px;padding:7px 8px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);color:#1c4c6d;font-size:16px;font-weight:900;vertical-align:middle}
+.group-row th{height:52px;padding:7px 8px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);color:#1c4c6d;font-size:23px;font-weight:900;line-height:1.28;white-space:nowrap;vertical-align:middle}
 .date-row th{height:64px;padding:7px 8px;background:linear-gradient(180deg,#f8fbfe 0%,#e0eef9 100%);font-size:23px;font-weight:900;white-space:nowrap;line-height:1.28;text-align:center;vertical-align:middle}
 .time-row th{height:88px;padding:8px 7px;background:#f9fcfe;color:#2c6b96;font-size:16px;line-height:1.55;font-weight:900;white-space:normal;overflow:visible;vertical-align:middle}
 .time-row .corner{color:var(--ink)}
@@ -178,26 +199,42 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .step .lb{font-size:14px;white-space:normal;line-height:1.4}
   .step .num{font-size:13px}
   .step .wh{font-size:12.5px}
-  .wrap{padding:8px 6px 16px}
+  .wrap{padding:8px 6px 104px}   /* 底部留白，內容才不會被固定的報名鈕蓋住 */
   .hint{width:100%;margin-left:0;font-size:14px;line-height:1.5}
   .folds{grid-template-columns:1fr;gap:8px}
   details.fold>summary{font-size:17px;padding:12px 13px}
   .fold-body{padding:11px 13px 13px}
   .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
+  .fc-node{padding:10px 11px 11px}
+  .fc-t{font-size:17px}
+  .fc-m{font-size:14px}
+  .fc-d{font-size:15px}
+  .fc-arrow{height:22px}
+  .fc-arrow::before{left:22px;bottom:8px}
+  .fc-arrow::after{left:18px}
   .shell{border-radius:10px}
   .shell::after{width:30px}
-  .signup{max-width:none;margin:2px 2px 12px;padding:15px 16px;border-radius:13px}
+  /* 手機：報名鈕固定浮在畫面底部，捲動時一直看得到 */
+  .signup{position:fixed;z-index:60;left:8px;right:8px;
+    bottom:calc(8px + env(safe-area-inset-bottom,0px));
+    max-width:none;margin:0;padding:15px 16px;border-radius:13px}
   .signup-tx{font-size:26px}
-  .swipe-hint{display:block;margin:0 2px 8px;padding:10px 12px;border-radius:11px;
+  .swipe-hint{display:block;overflow:hidden;max-height:90px;opacity:1;
+    margin:0 2px 8px;padding:10px 12px;border-radius:11px;
     background:#fff3e2;border:1.5px solid #e0a463;color:#7a4b1c;
-    font-size:16px;font-weight:900;text-align:center;line-height:1.5}
-  .swipe-hint[hidden]{display:none}
+    font-size:16px;font-weight:900;text-align:center;line-height:1.5;
+    transition:opacity .26s ease,max-height .32s ease,margin .32s ease,
+               padding .32s ease,border-width .32s ease,visibility .32s}
+  /* 滑過一次就收起來，長輩學會了就不再佔位置 */
+  .swipe-hint.gone{opacity:0;max-height:0;margin-top:0;margin-bottom:0;
+    padding-top:0;padding-bottom:0;border-width:0;visibility:hidden}
   .scroll{max-height:none}
   /* 手機：欄位縮小，一次看得到 3 天 */
-  .corner,.row-label{width:40px;min-width:40px;max-width:40px;font-size:13px}
-  .scroll{scroll-padding-left:40px}
+  /* 編號欄再寬 4px，「小組」「日期」才不會被擠成兩行 */
+  .corner,.row-label{width:44px;min-width:44px;max-width:44px;font-size:13px}
+  .scroll{scroll-padding-left:44px}
   .day-col{width:110px;min-width:110px;max-width:110px}
-  .group-row th{height:34px;padding:5px 3px;font-size:13px}
+  .group-row th{height:38px;padding:5px 3px;font-size:17px;line-height:1.3}
   .date-row th{height:auto;padding:7px 3px;font-size:17px;line-height:1.3}
   .time-row th{height:auto;padding:7px 3px;font-size:13px;line-height:1.45;overflow:visible}
   .count-row th{height:36px;padding:5px 3px;font-size:13px}
@@ -230,18 +267,30 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
     <details class="fold">
       <summary>📋 報名流程</summary>
       <div class="fold-body">
-        <div class="rows" id="flowRows">
-          <div class="r" data-p="0"><span class="d">即日–9/13<small>(日)</small></span>
-            <span><b>第一階段：向區中心報名了愿日期</b>
-              <em>職司 9/14 之後才分，大家一起討論認領，會照每個人方便的時間安排，不會直接指派。</em>
-              <div class="opts"><span class="opt">全天＋過夜</span><span class="opt">全天，當天回</span><span class="opt">只有白天（＿點～＿點）</span></div>
-            </span></div>
-          <div class="r" data-p="1"><span class="d">9/14–9/18<small>(五)</small></span>
-            <span><b>第二階段：職司初安排</b><em>分配烹飪、維安、清潔。</em></span></div>
-          <div class="r" data-p="2"><span class="d">9/21<small>(一)</small></span>
-            <span><b>線上壇辦班，職司最後調整</b></span></div>
-          <div class="r" data-p="3"><span class="d">9/27–10/4</span>
-            <span><b>12人小組輪值</b><em>9/27 14:00 交接、10/4 早上至 14:00 交接。</em></span></div>
+        <div class="flowchart" id="flowRows">
+          <div class="fc-node" data-p="0">
+            <span class="fc-head"><span class="fc-n">1</span><span class="fc-d">即日–9/13<small>(日)</small></span></span>
+            <b class="fc-t">向區中心報名了愿日期</b>
+            <em class="fc-m">職司 9/14 之後才分，大家一起討論認領，會照每個人方便的時間安排，不會直接指派。</em>
+            <div class="opts"><span class="opt">全天＋過夜</span><span class="opt">全天，當天回</span><span class="opt">只有白天（＿點～＿點）</span></div>
+          </div>
+          <div class="fc-arrow" aria-hidden="true"></div>
+          <div class="fc-node" data-p="1">
+            <span class="fc-head"><span class="fc-n">2</span><span class="fc-d">9/14–9/18<small>(五)</small></span></span>
+            <b class="fc-t">職司初安排</b>
+            <em class="fc-m">分配烹飪、維安、清潔。</em>
+          </div>
+          <div class="fc-arrow" aria-hidden="true"></div>
+          <div class="fc-node" data-p="2">
+            <span class="fc-head"><span class="fc-n">3</span><span class="fc-d">9/21<small>(一)</small></span></span>
+            <b class="fc-t">線上壇辦班，職司最後調整</b>
+          </div>
+          <div class="fc-arrow" aria-hidden="true"></div>
+          <div class="fc-node" data-p="3">
+            <span class="fc-head"><span class="fc-n">4</span><span class="fc-d">9/27–10/4</span></span>
+            <b class="fc-t">12人小組輪值</b>
+            <em class="fc-m">9/27 14:00 交接、10/4 早上至 14:00 交接。</em>
+          </div>
         </div>
       </div>
     </details>
@@ -261,7 +310,7 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
       </div>
     </details>
   </div>
-  <div class="swipe-hint" id="swipeHint" hidden>
+  <div class="swipe-hint gone" id="swipeHint">
     <i class="l">←</i> 左右滑動看其他日期 <i class="r">→</i>
   </div>
   <div class="shell">
@@ -579,7 +628,7 @@ function markFlowNow(){
   const cur=currentPhase();
   const i=(CONFIG.PHASES||[]).indexOf(cur);
   // 用 data-p 對應階段，不要用列的順序 —— 之後若某個階段拆成多列，順序就會錯位。
-  const rows=document.querySelectorAll('#flowRows .r');
+  const rows=document.querySelectorAll('#flowRows .fc-node');
   for(let k=0;k<rows.length;k++){
     rows[k].classList.toggle('now', i>=0 && rows[k].dataset.p===String(i));
   }
@@ -593,11 +642,15 @@ function updateScrollHint(){
   sc.parentElement.classList.toggle('more-right',
     canScroll && sc.scrollWidth-sc.clientWidth-sc.scrollLeft>4);
   const hint=$('swipeHint');
-  if(hint)hint.hidden=!canScroll;   // 表格一次看得完就不顯示提示
+  if(hint)hint.classList.toggle('gone', swipedOnce || !canScroll);
 }
 
 /* ---------- 事件綁定 ---------- */
-$('tableScroll').addEventListener('scroll',updateScrollHint,{passive:true});
+let swipedOnce=false;   // 使用者左右滑過一次之後，提示就不再出現
+$('tableScroll').addEventListener('scroll',()=>{
+  if($('tableScroll').scrollLeft>8)swipedOnce=true;
+  updateScrollHint();
+},{passive:true});
 window.addEventListener('resize',updateScrollHint);
 renderSteps();
 markFlowNow();
