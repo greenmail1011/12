@@ -45,7 +45,10 @@ h1{margin:0;font-size:clamp(27px,4.5vw,42px);line-height:1.22;text-shadow:0 1px 
   .hero-photo{position:absolute;inset:0;height:auto;background-position:center calc(16px - 15.3vw)}
   .hero::after{content:'';position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(180deg,rgba(6,26,43,0) 0%,rgba(6,26,43,.05) 42%,rgba(6,26,43,.5) 72%,rgba(6,26,43,.88) 100%)}
-  .hero-inner{position:relative;z-index:1;width:100%;padding:18px 14px 18px}
+  /* 上內距 = 建築下緣(16px + 13.44vw) + 26px 淨空，
+     所以不管階段折成幾行、文字多高，都一定從建築下方開始；
+     內容變高時 hero 會自己長高，不需要為每個斷點調數字。 */
+  .hero-inner{position:relative;z-index:1;width:100%;padding:calc(13.44vw + 42px) 14px 18px}
   h1{text-shadow:0 2px 12px rgba(4,20,34,.75),0 1px 3px rgba(4,20,34,.6)}
 }
 .steps{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
@@ -200,17 +203,16 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
         <div class="rows" id="flowRows">
           <div class="r" data-p="0"><span class="d">即日–9/13<small>(日)</small></span>
             <span><b>第一階段：不記職司安排</b>
-              <em>這階段只要告訴我們你哪幾天能來、大概幾點到幾點，還不用決定職司（直接洽區中心報名）。<br>
-              職司 9/14 之後才分，9/21 線上壇辦班大家一起討論認領，會照每個人方便的時間安排，不會直接指派。</em>
+              <em>職司 9/14 之後才分，大家一起討論認領，會照每個人方便的時間安排，不會直接指派。</em>
               <div class="opts"><span class="opt">全天＋過夜</span><span class="opt">全天，當天回</span><span class="opt">只有白天（＿點～＿點）</span></div>
             </span></div>
           <div class="r" data-p="1"><span class="d">9/14–9/18<small>(五)</small></span>
             <span><b>第二階段：劃分組別與職司</b><em>分配烹飪、維安、清潔。</em></span></div>
           <div class="r" data-p="2"><span class="d">9/21<small>(一)</small></span>
-            <span><b>線上壇辦班，職司調整討論</b></span></div>
-          <div class="r" data-p="2"><span class="d">9/24<small>(四)</small></span>
+            <span><b>線上壇辦班，職司調整</b></span></div>
+          <div class="r" data-p="3"><span class="d">9/24<small>(四)</small></span>
             <span><b>線上討論，最後調整</b></span></div>
-          <div class="r" data-p="3"><span class="d">9/27–10/4</span>
+          <div class="r" data-p="4"><span class="d">9/27–10/4</span>
             <span><b>12人小組輪值</b><em>9/27 14:00 交接、10/4 早上至 14:00 交接。</em></span></div>
         </div>
       </div>
@@ -252,30 +254,38 @@ const CONFIG = {
   PHASES:[
     {
       until:'2026-09-13',
-      lb:'① 不記職司安排',  wh:'即日起～9/13',
+      lb:'① 不記職司安排',      wh:'即日起～9/13',
       texts:[
         '請先確認你可以報名哪幾天、大概幾點到幾點（直接洽區中心報名）',
-        '職司 9/14 之後才分，9/21 線上壇辦班討論認領、9/24 線上討論最後調整，不會直接指派。'
+        '職司 9/14 之後才分，9/21 線上壇辦班職司調整、9/24 線上討論最後調整，不會直接指派。'
       ]
     },
     {
       until:'2026-09-18',
-      lb:'② 劃分組別與職司', wh:'9/14～9/18',
+      lb:'② 劃分組別與職司',     wh:'9/14～9/18',
       texts:[
         '9/14～9/18 劃分組別與職司。',
-        '9/21(一) 線上壇辦班討論認領、9/24(四) 線上討論最後調整。'
+        '9/21(一) 線上壇辦班職司調整；9/24(四) 線上討論最後調整。'
+      ]
+    },
+    {
+      until:'2026-09-21',
+      lb:'③ 線上壇辦班職司調整', wh:'9/21(一)',
+      texts:[
+        '9/21(一) 線上壇辦班，職司調整。',
+        '9/24(四) 還有一場線上討論，做最後調整。'
       ]
     },
     {
       until:'2026-09-24',
-      lb:'③ 線上討論職司調整', wh:'9/21・9/24',
+      lb:'④ 線上討論最後調整',   wh:'9/24(四)',
       texts:[
-        '9/21(一) 線上壇辦班職司調整討論；9/24(四) 線上討論最後調整。'
+        '9/24(四) 線上討論，最後調整。'
       ]
     },
     {
       until:null,
-      lb:'④ 12人小組輪值',   wh:'9/27～10/4',
+      lb:'⑤ 12人小組輪值',      wh:'9/27～10/4',
       texts:[
         '9/27(日)～10/4(日) 12人小組輪值，請依班表報到。'
       ]
