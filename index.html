@@ -13,7 +13,6 @@
   --brand:#e9a66f;--brand-dark:#c96f3d;--brand-soft:#fff1e5;
   --warn-bg:#fff3e7;--warn-line:#efc39f;--warn-ink:#633b20;
   --accent:#c66b3d;--today:#fff2df;--today-head:#f5c08f;
-  --ok:#2f6b4f;--open:#b4522a;
   --shadow:0 10px 28px rgba(32,58,48,.08)
 }
 *{box-sizing:border-box}
@@ -50,8 +49,8 @@ tbody tr:last-child>*{border-bottom:0}
 .time-row .corner{color:var(--ink)}
 .count-row th{position:static;height:46px;padding:6px 8px;background:#fbfaf6;font-size:16px;font-weight:900;white-space:nowrap;vertical-align:middle}
 .count-row .corner{color:var(--ink);font-size:15px}
-.cnt-full{color:var(--ok)}
-.cnt-open{color:var(--open)}
+.cnt{color:#5b4a3d}
+.cnt-zero{color:#b7bfba}
 .day-col{width:170px;min-width:170px;max-width:170px}
 .today-col{background:var(--today)!important}
 .date-row .today-col{background:var(--today-head)!important;color:#78451f}
@@ -122,9 +121,6 @@ tbody tr:nth-child(even) td:not(.today-col){background:#fbfcfb}
 const CONFIG = {
   SPREADSHEET_ID:'1GEE-2ISgzqAca-SblK2SSu8e7a_rlwyrkjH73wiHiW4',
   DATA_GID:'303688467',
-  // 每天預計要幾個人（12 人小組）。設 0 就只顯示已報名人數、不判斷額滿。
-  // 試算表目前有 17 個編號列，所以這裡是「目標人數」，不是實際可填的格數。
-  TARGET_PER_DAY:12,
   // 沒有「設定」分頁就留空字串，避免每 30 秒多打一次註定失敗的請求。
   SETTINGS_GID:'',
   CHECK_MS:30000,
@@ -333,10 +329,6 @@ function buildData(rows,settingsRows){
     if(g)currentGroup=g;
     groups.push(currentGroup);
   }
-  const slots=labels.length||17;                       // 表上實際可填的格數
-  const target=CONFIG.TARGET_PER_DAY>0
-    ? Math.min(CONFIG.TARGET_PER_DAY,slots)
-    : slots;                                            // 每天的目標人數
   const days=[];
   for(let c=0;c<8;c++){
     const dateText=String(dateRow[c]||'').trim();
@@ -358,10 +350,7 @@ function buildData(rows,settingsRows){
       time:String(timeRow[c]||'').trim(),
       people,
       notes,
-      capacity:target,
-      slots,
-      filled:people.length,
-      remaining:Math.max(0,target-people.length)
+      filled:people.length
     });
   }
   const settings={};
@@ -391,8 +380,6 @@ function buildData(rows,settingsRows){
     announcements:phaseTexts.concat(announcementItems),
     phasePill:phase?(phase.pill||''):'',
     rowLabels:labels,
-    slots,
-    target,
     days,
     today:todayIso()
   };
@@ -469,10 +456,8 @@ function buildTable(data){
     </th>`
   ).join('');
   const countHtml=data.days.map((d,i)=>{
-    const cls=d.remaining===0?'cnt-full':'cnt-open';
-    const tail=d.remaining===0?'　已滿':'';
     return `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
-      <span class="${cls}">${d.filled}/${d.capacity}${tail}</span>
+      <span class="cnt${d.filled?'':' cnt-zero'}">${d.filled} 人</span>
     </th>`;
   }).join('');
   const body=labels.map(label=>{
