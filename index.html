@@ -85,7 +85,7 @@ details.fold>summary:focus-visible{outline:3px solid var(--brand-dark);outline-o
 
 /* 報名按鈕：整頁最醒目的一顆，金色底＋光帶掃過的金光閃閃效果 */
 .signup{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;
-  max-width:280px;margin:2px auto 12px;padding:10px 18px;border-radius:11px;
+  max-width:280px;margin:2px auto 12px;padding:11px 26px;border-radius:999px;
   text-decoration:none;color:#5b3d09;font-weight:900;line-height:1.3;
   background:linear-gradient(180deg,#fff3c4 0%,#f7dc76 22%,#eec144 50%,#dda92c 74%,#c9931a 100%);
   border:1px solid #b8860b;animation:signupGlow 2.6s ease-in-out infinite}
@@ -173,7 +173,7 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .step .lb{font-size:14px;white-space:normal;line-height:1.4}
   .step .num{font-size:13px}
   .step .wh{font-size:12.5px}
-  .wrap{padding:8px 6px 66px}   /* 底部留白，內容才不會被固定的報名鈕蓋住 */
+  .wrap{padding:8px 6px calc(76px + env(safe-area-inset-bottom,0px))}   /* 底部留白，內容才不會被浮動報名鈕蓋住 */
   .hint{width:100%;margin-left:0;font-size:14px;line-height:1.5}
   .folds{gap:8px}
   details.fold>summary{font-size:17px;padding:12px 13px}
@@ -181,12 +181,16 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
   .shell{border-radius:10px}
   .shell::after{width:30px}
-  /* 手機：報名鈕整條貼在畫面最底部，捲動時一直看得到 */
-  .signup{position:fixed;z-index:60;left:0;right:0;bottom:0;
-    max-width:none;margin:0;border-radius:0;
-    border-width:1px 0 0 0;
-    padding:9px 16px calc(9px + env(safe-area-inset-bottom,0px))}
-  .signup-tx{font-size:18px}
+  /* 手機：報名鈕做成浮在底部的圓角按鈕。
+     安全區（iPhone home 橫條）留成透明距離，不要填金色，
+     否則按鈕下方會多出一塊沒有用途的「下巴」。 */
+  .signup{position:fixed;z-index:60;left:50%;right:auto;
+    transform:translateX(-50%);
+    bottom:calc(11px + env(safe-area-inset-bottom,0px));
+    width:auto;min-width:58%;max-width:calc(100% - 32px);
+    margin:0;padding:12px 30px;border-radius:999px;border-width:1px}
+  .signup:active{transform:translateX(-50%) translateY(1px)}
+  .signup-tx{font-size:19px}
   .swipe-hint{display:block;overflow:hidden;max-height:90px;opacity:1;
     margin:0 2px 8px;padding:10px 12px;border-radius:11px;
     background:#fff3e2;border:1.5px solid #e0a463;color:#7a4b1c;
