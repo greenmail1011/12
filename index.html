@@ -198,18 +198,19 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
       <summary>📋 報名流程</summary>
       <div class="fold-body">
         <div class="rows" id="flowRows">
-          <div class="r"><span class="d">即日–9/13<small>(日)</small></span>
+          <div class="r" data-p="0"><span class="d">即日–9/13<small>(日)</small></span>
             <span><b>第一階段：不記職司安排</b>
               <em>這階段只要告訴我們你哪幾天能來、大概幾點到幾點，還不用決定職司（直接洽區中心報名）。<br>
-              職司 9/14 之後才分，9/21 線上壇辦班大家一起討論認領，會照每個人方便的時間安排，不會直接指派。<br>
-              其中<b>清潔不需要過夜</b>，白天能來就幫得上忙。</em>
+              職司 9/14 之後才分，9/21 線上壇辦班大家一起討論認領，會照每個人方便的時間安排，不會直接指派。</em>
               <div class="opts"><span class="opt">全天＋過夜</span><span class="opt">全天，當天回</span><span class="opt">只有白天（＿點～＿點）</span></div>
             </span></div>
-          <div class="r"><span class="d">9/14–9/18<small>(五)</small></span>
+          <div class="r" data-p="1"><span class="d">9/14–9/18<small>(五)</small></span>
             <span><b>第二階段：劃分組別與職司</b><em>分配烹飪、維安、清潔。</em></span></div>
-          <div class="r"><span class="d">9/21<small>(一)</small></span>
-            <span><b>線上壇辦班職司調整討論</b></span></div>
-          <div class="r"><span class="d">9/27–10/4</span>
+          <div class="r" data-p="2"><span class="d">9/21<small>(一)</small></span>
+            <span><b>線上壇辦班，職司調整討論</b></span></div>
+          <div class="r" data-p="2"><span class="d">9/24<small>(四)</small></span>
+            <span><b>線上討論，最後調整</b></span></div>
+          <div class="r" data-p="3"><span class="d">9/27–10/4</span>
             <span><b>12人小組輪值</b><em>9/27 14:00 交接、10/4 早上至 14:00 交接。</em></span></div>
         </div>
       </div>
@@ -224,7 +225,7 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
           <div class="r"><span class="d">🛡️ 維安</span>
             <span>要<b>睡一晚</b>，隔天執完早香、完成交接後才離開。<em>職司完整不空窗：當天 → 隔天早香後</em></span></div>
           <div class="r"><span class="d">🧹 清潔</span>
-            <span><b>不需要過夜</b>，白天能來就能做，沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
+            <span>沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
         </div>
         <div class="foldnote">⚠️ 要讓職司完整不空窗，前後各要多一天：9/26 晚上首日主要烹飪就要到，10/5 早上最後一位維安才離開。排班時同一人可能表面沒撞、實際撞班。</div>
       </div>
@@ -254,32 +255,29 @@ const CONFIG = {
       lb:'① 不記職司安排',  wh:'即日起～9/13',
       texts:[
         '請先確認你可以報名哪幾天、大概幾點到幾點（直接洽區中心報名）',
-        '職司 9/14 之後才分，9/21 線上壇辦班一起討論認領；清潔不用過夜，白天來也幫得上忙。'
+        '職司 9/14 之後才分，9/21 線上壇辦班討論認領、9/24 線上討論最後調整，不會直接指派。'
       ]
     },
     {
       until:'2026-09-18',
       lb:'② 劃分組別與職司', wh:'9/14～9/18',
       texts:[
-        '🍳 烹飪：主要烹飪需前一天晚上先到，與頭手交接，並確認隔天早上人力是否足夠。',
-        '🛡️ 維安：需睡一晚，至隔天執完早香、完成交接後才能離開。'
+        '9/14～9/18 劃分組別與職司。',
+        '9/21(一) 線上壇辦班討論認領、9/24(四) 線上討論最後調整。'
       ]
     },
     {
-      until:'2026-09-21',
-      lb:'③ 線上壇辦班職司調整討論', wh:'9/21(一)',
+      until:'2026-09-24',
+      lb:'③ 線上討論職司調整', wh:'9/21・9/24',
       texts:[
-        '9/21(一) 線上壇辦班，職司調整討論。',
-        '🍳 烹飪：主要烹飪需前一天晚上先到，與頭手交接，並確認隔天早上人力是否足夠。',
-        '🛡️ 維安：需睡一晚，至隔天執完早香、完成交接後才能離開。'
+        '9/21(一) 線上壇辦班職司調整討論；9/24(四) 線上討論最後調整。'
       ]
     },
     {
       until:null,
       lb:'④ 12人小組輪值',   wh:'9/27～10/4',
       texts:[
-        '🍳 烹飪：主要烹飪需前一天晚上先到，與頭手交接，並確認隔天早上人力是否足夠。',
-        '🛡️ 維安：需睡一晚，至隔天執完早香、完成交接後才能離開。'
+        '9/27(日)～10/4(日) 12人小組輪值，請依班表報到。'
       ]
     }
   ]
@@ -648,8 +646,11 @@ function renderSteps(){
 function markFlowNow(){
   const cur=currentPhase();
   const i=(CONFIG.PHASES||[]).indexOf(cur);
+  // 用 data-p 對應階段，不能用列的順序 —— 9/21 和 9/24 同屬階段 ③，列數比階段多。
   const rows=document.querySelectorAll('#flowRows .r');
-  for(let k=0;k<rows.length;k++) rows[k].classList.toggle('now',k===i);
+  for(let k=0;k<rows.length;k++){
+    rows[k].classList.toggle('now', i>=0 && rows[k].dataset.p===String(i));
+  }
 }
 
 /* 視窗寬度變了，跑馬燈長度要重算 */
