@@ -85,7 +85,7 @@ h1 .t-date,h1 .t-name{display:block}
 .warnbar[hidden]{display:none}
 
 /* 折疊區：職司說明 */
-.folds{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;margin-bottom:10px}
+.folds{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;margin:12px 0 4px}
 details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 details.fold>summary{list-style:none;cursor:pointer;padding:12px 15px;font-size:18px;font-weight:900;
   color:#1c4c6d;background:linear-gradient(180deg,#eef6fc 0%,#d9e9f7 100%);display:flex;align-items:center;gap:9px}
@@ -257,9 +257,17 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   </div>
   <div class="warnbar" id="warnbar" hidden></div>
 
+  <div class="swipe-hint gone" id="swipeHint">
+    <i class="l">←</i> 左右滑動看其他日期 <i class="r">→</i>
+  </div>
+  <div class="shell">
+    <div class="scroll" id="tableScroll">
+      <div id="content" class="status">正在讀取勤務表…</div>
+    </div>
+  </div>
   <div class="folds">
     <details class="fold">
-      <summary>🍳 職司與交接規則</summary>
+      <summary>第二階段：職司規劃說明</summary>
       <div class="fold-body">
         <div class="rows">
           <div class="r"><span class="d">🍳 烹飪</span>
@@ -271,14 +279,6 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
         </div>
       </div>
     </details>
-  </div>
-  <div class="swipe-hint gone" id="swipeHint">
-    <i class="l">←</i> 左右滑動看其他日期 <i class="r">→</i>
-  </div>
-  <div class="shell">
-    <div class="scroll" id="tableScroll">
-      <div id="content" class="status">正在讀取勤務表…</div>
-    </div>
   </div>
   <div class="footer">每 30 秒自動同步 Google 試算表；內容有變更才更新。｜已採大字、高對比版面。</div>
 </main>
