@@ -84,6 +84,17 @@ h1 .t-date,h1 .t-name{display:block}
 .warnbar{margin:0 0 9px;padding:10px 12px;border:1px solid #e8c08f;background:#fff5e8;color:#7a4b1c;border-radius:11px;font-size:15px;font-weight:800;line-height:1.55}
 .warnbar[hidden]{display:none}
 
+/* 備註：從表格裡搬出來，一行一則、整頁寬度，手機才讀得完 */
+.notes-box{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:13px;
+  box-shadow:var(--shadow);overflow:hidden}
+.notes-box[hidden]{display:none}
+.notes-head{padding:11px 16px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);
+  border-bottom:1px solid var(--line);color:#1c4c6d;font-size:19px;font-weight:900}
+.notes-list{padding:2px 16px 8px}
+.note-item{padding:11px 0;border-bottom:1px solid #e2ebf3;font-size:17px;line-height:1.7;color:#3f5262}
+.note-item:last-child{border-bottom:0}
+.note-item b{color:var(--ink);font-weight:900}
+
 /* 折疊區：職司說明 */
 .folds{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;margin:12px 0 4px}
 details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
@@ -178,9 +189,6 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
 .person{font-size:22px;font-weight:900}
 .empty{color:#bccbd7}
 .group-start{border-left:3px solid #9cc6e5!important}
-.notes-row td{height:auto;padding:8px;text-align:left;color:#4b5b68;font-size:16px;line-height:1.6}
-tbody tr.notes-row td:not(.today-col){background:#e6eef6}
-tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--ink)}
 .status{padding:42px 18px;text-align:center;color:var(--muted)}
 .error-title{font-weight:900;color:#8f3f34;margin-bottom:7px}
 .footer{padding:9px 6px 0;text-align:center;color:var(--muted);font-size:15px;line-height:1.6}
@@ -200,6 +208,9 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   .folds{gap:8px}
   details.fold>summary{font-size:17px;padding:12px 13px}
   .fold-body{padding:11px 13px 13px}
+  .notes-head{font-size:17px;padding:10px 13px}
+  .notes-list{padding:2px 13px 6px}
+  .note-item{font-size:16px;padding:10px 0}
   .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
   .shell{border-radius:10px}
   .shell::after{width:30px}
@@ -235,7 +246,6 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
   tbody td{height:44px;padding:6px 3px;font-size:17px}
   .person{font-size:17px;font-weight:900}
   .today-mark{font-size:9px;margin-top:1px}
-  .notes-row td{font-size:13px;line-height:1.55;padding:6px}
   .footer{font-size:13px;line-height:1.5}
 }
 </style>
@@ -265,6 +275,7 @@ tbody tr.notes-row .row-label{text-align:center;background:#d8e6f2;color:var(--i
       <div id="content" class="status">正在讀取勤務表…</div>
     </div>
   </div>
+  <div class="notes-box" id="notesBox" hidden></div>
   <div class="folds">
     <details class="fold">
       <summary>第二階段：職司規劃說明</summary>
@@ -502,7 +513,32 @@ function buildData(rows){
 function render(data){
   $('content').className='';
   $('content').innerHTML=buildTable(data);
+  buildNotes(data);
   updateScrollHint();
+}
+
+/* 備註改成表格下方的清單：一格裡用換行分開的多則會被拆成多行，
+   「姓名：內容」的姓名會加粗，方便掃。 */
+function buildNotes(data){
+  const box=$('notesBox');
+  if(!box)return;
+  const items=[];
+  (data.days||[]).forEach(d=>{
+    (d.notes||[]).forEach(t=>{
+      String(t).split(/\r?\n/).forEach(line=>{
+        const v=line.trim();
+        if(v && items.indexOf(v)<0) items.push(v);
+      });
+    });
+  });
+  if(!items.length){box.hidden=true;box.innerHTML='';return;}
+  box.innerHTML='<div class="notes-head">備註</div><div class="notes-list">'+
+    items.map(t=>{
+      const m=t.match(/^([^：:]{1,12})[：:]\s*(.+)$/);
+      return '<div class="note-item">'+
+        (m ? '<b>'+esc(m[1])+'</b>：'+esc(m[2]) : esc(t))+'</div>';
+    }).join('')+'</div>';
+  box.hidden=false;
 }
 function buildTable(data){
   if(!data.days.length)return '<div class="status">目前沒有勤務資料。</div>';
@@ -536,15 +572,6 @@ function buildTable(data){
     }).join('');
     return `<tr><th class="row-label">${esc(label)}</th>${tds}</tr>`;
   }).join('');
-  const hasNotes=data.days.some(d=>d.notes&&d.notes.length);
-  const notes=hasNotes?`
-    <tr class="notes-row">
-      <th class="row-label">備註</th>
-      ${data.days.map((d,i)=>`
-        <td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
-          ${(d.notes||[]).map(esc).join('<br>')}
-        </td>`).join('')}
-    </tr>`:'';
   return `<table>
     <thead>
       <tr class="group-row"><th class="corner">小組</th>${groupHtml}</tr>
@@ -552,7 +579,7 @@ function buildTable(data){
       <tr class="time-row"><th class="corner">時間</th>${timeHtml}</tr>
       <tr class="count-row"><th class="corner">人數</th>${countHtml}</tr>
     </thead>
-    <tbody>${body}${notes}</tbody>
+    <tbody>${body}</tbody>
   </table>`;
 }
 function groupSpans(days){
