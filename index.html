@@ -84,6 +84,33 @@ h1 .t-date,h1 .t-name{display:block}
 .warnbar{margin:0 0 9px;padding:10px 12px;border:1px solid #e8c08f;background:#fff5e8;color:#7a4b1c;border-radius:11px;font-size:15px;font-weight:800;line-height:1.55}
 .warnbar[hidden]{display:none}
 
+/* 有備註的名字：可以點，點了在旁邊跳出小氣泡 */
+.person.has-note{appearance:none;border:0;background:none;font:inherit;color:inherit;
+  cursor:pointer;display:inline-flex;align-items:center;gap:5px;
+  padding:2px 6px;border-radius:9px;box-shadow:inset 0 -2px 0 rgba(47,111,158,.4)}
+.person.has-note:hover{background:var(--brand-soft)}
+.person.has-note:focus-visible{outline:3px solid var(--brand-dark);outline-offset:1px}
+.person .mk{display:inline-grid;place-items:center;flex:0 0 auto;
+  width:19px;height:19px;border-radius:50%;background:var(--brand-dark);color:#fff;
+  font-size:11px;font-weight:900;line-height:1}
+
+/* 備註氣泡：用 fixed 定位，才不會被會左右捲動的表格裁掉 */
+.pop{position:fixed;z-index:200;max-width:min(330px,calc(100vw - 24px));
+  background:#fff;border:1.5px solid var(--brand-dark);border-radius:12px;
+  box-shadow:0 14px 34px rgba(16,48,74,.3);padding:13px 34px 13px 15px;
+  font-size:16.5px;line-height:1.7;color:#31465a}
+.pop[hidden]{display:none}
+.pop::before{content:'';position:absolute;left:var(--ax,20px);width:13px;height:13px;
+  background:#fff;transform:rotate(45deg)}
+.pop.below::before{top:-8px;border-left:1.5px solid var(--brand-dark);border-top:1.5px solid var(--brand-dark)}
+.pop.above::before{bottom:-8px;border-right:1.5px solid var(--brand-dark);border-bottom:1.5px solid var(--brand-dark)}
+.pop-name{font-size:17px;font-weight:900;color:var(--brand-dark);margin-bottom:5px}
+.pop-body p{margin:0}
+.pop-body p+p{margin-top:7px}
+.pop-x{position:absolute;top:5px;right:7px;appearance:none;border:0;background:none;
+  font-size:23px;line-height:1;color:#8ba4b8;cursor:pointer;padding:2px 5px;border-radius:7px}
+.pop-x:hover{background:#eef4f9;color:var(--ink)}
+
 /* 備註：從表格裡搬出來，一行一則、整頁寬度，手機才讀得完 */
 .notes-box{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:13px;
   box-shadow:var(--shadow);overflow:hidden}
@@ -211,6 +238,9 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
   .notes-head{font-size:17px;padding:10px 13px}
   .notes-list{padding:2px 13px 6px}
   .note-item{font-size:16px;padding:10px 0}
+  .person .mk{width:17px;height:17px;font-size:10px}
+  .person.has-note{gap:4px;padding:2px 4px}
+  .pop{font-size:16px;padding:12px 32px 12px 14px}
   .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
   .shell{border-radius:10px}
   .shell::after{width:30px}
@@ -294,6 +324,12 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
   <div class="footer">每 30 秒自動同步 Google 試算表；內容有變更才更新。｜已採大字、高對比版面。</div>
 </main>
 
+<div class="pop" id="pop" hidden role="dialog" aria-label="備註">
+  <button type="button" class="pop-x" id="popX" aria-label="關閉">×</button>
+  <div class="pop-name" id="popName"></div>
+  <div class="pop-body" id="popBody"></div>
+</div>
+
 <script>
 const CONFIG = {
   SPREADSHEET_ID:'1GEE-2ISgzqAca-SblK2SSu8e7a_rlwyrkjH73wiHiW4',
@@ -310,6 +346,7 @@ const CONFIG = {
 };
 
 let currentData=null;
+let noteByName=new Map();   // 姓名 → 備註內容（給表格裡的名字用）
 let currentHash='';
 let timer=null;
 let querySerial=0;
@@ -511,10 +548,28 @@ function buildData(rows){
 
 /* ---------- 畫面 ---------- */
 function render(data){
+  noteByName=buildNoteMap(data);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
   buildNotes(data);
   updateScrollHint();
+}
+
+/* 從備註裡抓出「姓名：內容」，做成對照表，表格裡同名的人就能點開看 */
+function buildNoteMap(data){
+  const m=new Map();
+  (data.days||[]).forEach(d=>(d.notes||[]).forEach(t=>{
+    String(t).split(/\r?\n/).forEach(line=>{
+      const v=line.trim();
+      if(!v)return;
+      const mm=v.match(/^([^：:]{1,12})[：:]\s*(.+)$/);
+      if(!mm)return;
+      const k=mm[1].trim(), body=mm[2].trim();
+      if(!m.has(k))m.set(k,[]);
+      if(m.get(k).indexOf(body)<0)m.get(k).push(body);
+    });
+  }));
+  return m;
 }
 
 /* 備註改成表格下方的清單：一格裡用換行分開的多則會被拆成多行，
@@ -566,9 +621,14 @@ function buildTable(data){
   const body=labels.map(label=>{
     const tds=data.days.map((d,i)=>{
       const p=(d.people||[]).find(x=>String(x.no)===String(label));
-      return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
-        ${p?`<span class="person">${esc(p.name)}</span>`:'<span class="empty">—</span>'}
-      </td>`;
+      let cell='<span class="empty">—</span>';
+      if(p){
+        cell = noteByName.has(p.name)
+          ? `<button type="button" class="person has-note" data-name="${esc(p.name)}" `+
+            `aria-label="${esc(p.name)}，有備註，點開查看">${esc(p.name)}<span class="mk">註</span></button>`
+          : `<span class="person">${esc(p.name)}</span>`;
+      }
+      return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">${cell}</td>`;
     }).join('');
     return `<tr><th class="row-label">${esc(label)}</th>${tds}</tr>`;
   }).join('');
@@ -624,7 +684,88 @@ function updateScrollHint(){
   if(hint)hint.classList.toggle('gone', swipedOnce || !canScroll);
 }
 
+/* ---------- 備註氣泡 ---------- */
+let popBtn=null;          // 目前氣泡對應的名字按鈕
+let popRaf=0, popLast='';
+
+/* 把氣泡對到名字下方（放不下就翻到上方）；名字被捲出畫面就收起來 */
+function positionPop(){
+  if(!popBtn)return;
+  const pop=$('pop');
+  const r=popBtn.getBoundingClientRect();
+  // 算出名字「真正看得到」的左右範圍：
+  // 左右會被表格可視範圍裁掉，左邊還會被固定在最左的編號欄蓋住。
+  let vl=r.left, vr=r.right;
+  const sc=$('tableScroll');
+  if(sc){
+    const sr=sc.getBoundingClientRect();
+    const lab=sc.querySelector('.row-label,.corner');
+    const lw=lab?lab.getBoundingClientRect().width:0;
+    vl=Math.max(vl,sr.left+lw);
+    vr=Math.min(vr,sr.right);
+  }
+  // 名字捲出畫面（上下），或被擠到幾乎看不見（左右）就收起來
+  if(r.bottom<0 || r.top>window.innerHeight || vr-vl<12){closePop();return;}
+  pop.classList.remove('above','below');
+  const cx=(vl+vr)/2;                       // 對準看得到的那一段的中心
+  const pw=pop.offsetWidth, ph=pop.offsetHeight, M=12;
+  let left=Math.max(M,Math.min(cx-pw/2,window.innerWidth-pw-M));
+  // 手機的報名鈕是浮在最底下的，氣泡不能躲到它後面
+  let limit=window.innerHeight-M;
+  const sb=document.querySelector('.signup');
+  if(sb&&getComputedStyle(sb).position==='fixed')limit=Math.min(limit,sb.getBoundingClientRect().top-8);
+  const below=r.bottom+10+ph<=limit;
+  const top=below ? r.bottom+10 : Math.max(M,r.top-10-ph);
+  pop.classList.add(below?'below':'above');
+  pop.style.left=left+'px';
+  pop.style.top=top+'px';
+  // 箭頭對準名字
+  pop.style.setProperty('--ax',Math.max(10,Math.min(cx-left-6.5,pw-24))+'px');
+}
+/* 氣泡開著時每幀盯著名字的位置：捲動、版面位移（例如滑動提示收起來）都跟得上 */
+function popTick(){
+  if(!popBtn){popRaf=0;return;}
+  const r=popBtn.getBoundingClientRect();
+  const key=Math.round(r.left)+','+Math.round(r.top)+','+Math.round(r.width);
+  if(key!==popLast){popLast=key;positionPop();}
+  popRaf=popBtn?requestAnimationFrame(popTick):0;
+}
+function openPop(btn){
+  const name=btn.dataset.name, list=noteByName.get(name);
+  if(!list||!list.length)return;
+  const pop=$('pop');
+  $('popName').textContent=name;
+  $('popBody').innerHTML=list.map(t=>'<p>'+esc(t)+'</p>').join('');
+  pop.hidden=false;          // 先顯示才量得到大小
+  popBtn=btn;
+  popLast='';
+  pop.dataset.open='1';
+  positionPop();
+  if(!popRaf)popRaf=requestAnimationFrame(popTick);
+}
+function closePop(){
+  const pop=$('pop');
+  if(!pop)return;
+  pop.hidden=true;
+  popBtn=null;
+  if(popRaf){cancelAnimationFrame(popRaf);popRaf=0;}
+  delete pop.dataset.open;
+}
+
 /* ---------- 事件綁定 ---------- */
+$('content').addEventListener('click',e=>{
+  const btn=e.target.closest('.person.has-note');
+  if(!btn)return;
+  e.stopPropagation();
+  if($('pop').dataset.open==='1' && $('popName').textContent===btn.dataset.name){closePop();return;}
+  openPop(btn);
+});
+$('popX').addEventListener('click',closePop);
+document.addEventListener('click',e=>{
+  if($('pop').dataset.open==='1' && !e.target.closest('#pop'))closePop();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')closePop(); });
+
 $('tableScroll').addEventListener('scroll',()=>{
   if($('tableScroll').scrollLeft>8)swipedOnce=true;
   updateScrollHint();
