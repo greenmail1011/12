@@ -105,6 +105,7 @@ h1 .t-date,h1 .t-name{display:block}
 .pop.below::before{top:-8px;border-left:1.5px solid var(--brand-dark);border-top:1.5px solid var(--brand-dark)}
 .pop.above::before{bottom:-8px;border-right:1.5px solid var(--brand-dark);border-bottom:1.5px solid var(--brand-dark)}
 .pop-name{font-size:17px;font-weight:900;color:var(--brand-dark);margin-bottom:5px}
+.pop-when{margin-left:7px;font-size:14px;font-weight:800;color:#7d95a8}
 .pop-body p{margin:0}
 .pop-body p+p{margin-top:7px}
 .pop-x{position:absolute;top:5px;right:7px;appearance:none;border:0;background:none;
@@ -117,9 +118,18 @@ h1 .t-date,h1 .t-name{display:block}
 .notes-box[hidden]{display:none}
 .notes-head{padding:11px 16px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);
   border-bottom:1px solid var(--line);color:#1c4c6d;font-size:19px;font-weight:900}
-.notes-list{padding:2px 16px 8px}
-.note-item{padding:11px 0;border-bottom:1px solid #e2ebf3;font-size:17px;line-height:1.7;color:#3f5262}
-.note-item:last-child{border-bottom:0}
+.notes-list{padding:2px 16px 10px}
+/* 依日期分組：左邊日期、右邊那天的備註 */
+.note-day{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid #e2ebf3}
+.note-day:last-child{border-bottom:0}
+.note-day.now{background:var(--today);margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:9px}
+.nd-date{flex:0 0 96px;font-size:17px;font-weight:900;color:var(--brand-dark);
+  white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.7}
+.nd-today{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;
+  background:#0f4266;color:#fff;font-size:11px;font-weight:900;vertical-align:2px}
+.nd-items{flex:1 1 auto;min-width:0}
+.note-item{font-size:17px;line-height:1.7;color:#3f5262}
+.note-item+.note-item{margin-top:5px}
 .note-item b{color:var(--ink);font-weight:900}
 
 /* 折疊區：職司說明 */
@@ -168,15 +178,6 @@ details.fold>summary:focus-visible{outline:3px solid var(--brand-dark);outline-o
     box-shadow:inset 0 1px 0 rgba(255,252,232,.8),inset 0 -2px 0 rgba(146,101,10,.3),0 5px 16px rgba(196,145,25,.42)}
   .signup::after{animation:none;opacity:0}
 }
-
-/* 手機才出現的左右滑動提示（電腦上表格通常一次看得完，不需要） */
-.swipe-hint{display:none}
-.swipe-hint i{font-style:normal;display:inline-block;font-size:19px;vertical-align:-1px}
-.swipe-hint i.l{animation:nudgeL 1.6s ease-in-out infinite}
-.swipe-hint i.r{animation:nudgeR 1.6s ease-in-out infinite}
-@keyframes nudgeL{0%,100%{transform:translateX(0)}50%{transform:translateX(-6px)}}
-@keyframes nudgeR{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
-@media (prefers-reduced-motion:reduce){.swipe-hint i.l,.swipe-hint i.r{animation:none}}
 
 /* 表格 */
 .shell{position:relative;background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
@@ -236,8 +237,11 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
   details.fold>summary{font-size:17px;padding:12px 13px}
   .fold-body{padding:11px 13px 13px}
   .notes-head{font-size:17px;padding:10px 13px}
-  .notes-list{padding:2px 13px 6px}
-  .note-item{font-size:16px;padding:10px 0}
+  .notes-list{padding:2px 13px 8px}
+  .note-day{gap:10px;padding:10px 0}
+  .note-day.now{margin:0 -8px;padding-left:8px;padding-right:8px}
+  .nd-date{flex-basis:74px;font-size:16px}
+  .note-item{font-size:16px}
   .person .mk{width:17px;height:17px;font-size:10px}
   .person.has-note{gap:4px;padding:2px 4px}
   .pop{font-size:16px;padding:12px 32px 12px 14px}
@@ -254,15 +258,6 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
     margin:0;padding:12px 30px;border-radius:999px;border-width:1px}
   .signup:active{transform:translateX(-50%) translateY(1px)}
   .signup-tx{font-size:19px}
-  .swipe-hint{display:block;overflow:hidden;max-height:90px;opacity:1;
-    margin:0 2px 8px;padding:10px 12px;border-radius:11px;
-    background:#fff3e2;border:1.5px solid #e0a463;color:#7a4b1c;
-    font-size:16px;font-weight:900;text-align:center;line-height:1.5;
-    transition:opacity .26s ease,max-height .32s ease,margin .32s ease,
-               padding .32s ease,border-width .32s ease,visibility .32s}
-  /* 滑過一次就收起來，長輩學會了就不再佔位置 */
-  .swipe-hint.gone{opacity:0;max-height:0;margin-top:0;margin-bottom:0;
-    padding-top:0;padding-bottom:0;border-width:0;visibility:hidden}
   .scroll{max-height:none}
   /* 手機：欄位縮小，一次看得到 3 天 */
   /* 編號欄再寬 4px，「小組」「日期」才不會被擠成兩行 */
@@ -297,9 +292,6 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
   </div>
   <div class="warnbar" id="warnbar" hidden></div>
 
-  <div class="swipe-hint gone" id="swipeHint">
-    <i class="l">←</i> 左右滑動看其他日期 <i class="r">→</i>
-  </div>
   <div class="shell">
     <div class="scroll" id="tableScroll">
       <div id="content" class="status">正在讀取勤務表…</div>
@@ -337,6 +329,9 @@ const CONFIG = {
   CHECK_MS:30000,
   // 報名階段。until 是這個階段的最後一天（含）；最後一個階段的 until 設 null。
   // 系統會依台北時間自動切換，不用手動改。
+  // 備註內容只有這些字的，等於「沒有特別狀況」，不列也不加「註」
+  // （時間列已經寫了全天，再寫一次是重複的）。要多濾就加進這個清單。
+  SKIP_NOTES:['全天','整天','一整天','全日','正常','照常'],
   PHASES:[
     { until:'2026-09-13', n:'①', wh:'即日起～9/13', lb:'向區中心報名了愿日期' },
     { until:'2026-09-18', n:'②', wh:'9/14～9/18',  lb:'職司初安排' },
@@ -346,7 +341,7 @@ const CONFIG = {
 };
 
 let currentData=null;
-let noteByName=new Map();   // 姓名 → 備註內容（給表格裡的名字用）
+let noteIdx={byNameDate:new Map(),byDate:new Map(),undated:[]};  // 備註索引：姓名@日期 / 日期 / 沒寫日期的
 let currentHash='';
 let timer=null;
 let querySerial=0;
@@ -548,51 +543,136 @@ function buildData(rows){
 
 /* ---------- 畫面 ---------- */
 function render(data){
-  noteByName=buildNoteMap(data);
+  noteIdx=buildNoteIndex(data);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
   buildNotes(data);
   updateScrollHint();
 }
 
-/* 從備註裡抓出「姓名：內容」，做成對照表，表格裡同名的人就能點開看 */
-function buildNoteMap(data){
-  const m=new Map();
-  (data.days||[]).forEach(d=>(d.notes||[]).forEach(t=>{
-    String(t).split(/\r?\n/).forEach(line=>{
-      const v=line.trim();
-      if(!v)return;
-      const mm=v.match(/^([^：:]{1,12})[：:]\s*(.+)$/);
-      if(!mm)return;
-      const k=mm[1].trim(), body=mm[2].trim();
-      if(!m.has(k))m.set(k,[]);
-      if(m.get(k).indexOf(body)<0)m.get(k).push(body);
+/* ---------- 備註拆解 ----------
+   試算表的備註是一整格、用換行分成好幾則，每則長這樣：
+     蔡梅烽、葉鳳蘭：9/27(日)、9/28(一)全天、9/29(二)中餐結束1點離開、10/3(六)、10/4(日)全天
+   要把它拆成「哪個人、哪一天、那天的內容」，表格裡才能只顯示當天那一段。
+
+   拆法：
+   1. 冒號前面是人名，可以有好幾個（用、或,分開）
+   2. 冒號後面用「、」切成小段
+   3. 每小段開頭是日期才算數（日期前面可以有 4 個字以內的引導詞，例如「報名9/29」）
+      —— 句子中間才出現的日期（例如「不能過夜，因為10/1要上班」）不會被誤認成另一天
+   4. 開頭是日期、後面沒有字的小段（例如「9/27(日)」），描述由後面那段接手
+      （「9/27(日)、9/28(一)全天」＝兩天都是全天）
+   5. 整則都沒有寫日期的（例如「曾玉錦：安排清潔」）不掛在任何一天，只留在下方清單 */
+const DATE_ONE=/(\d{1,2})\/(\d{1,2})(?:\s*\([^)]{0,6}\))?/;
+const DATE_LEAD=new RegExp('^\\s*([^\\d：:]{0,4}?)((?:'+DATE_ONE.source+'\\s*[、,，]?\\s*)+)');
+
+function noteIso(mm){
+  return '2026-'+String(+mm[1]).padStart(2,'0')+'-'+String(+mm[2]).padStart(2,'0');
+}
+function noteTrim(t){
+  return String(t||'').replace(/^[\s、,，。:：]+|[\s、,，]+$/g,'').trim();
+}
+/* 把一則備註的內容拆成 [{dates:[iso],text}] */
+function splitByDate(content){
+  const out=[];
+  let pending=[], prefix='';
+  // 逗號／句號後面「緊接著日期」的才視為分隔，
+  // 「晚上6:00下班，大約7點左右到達」這種句中逗號不會被切開。
+  const segs=String(content)
+    .replace(/[，,。；;]\s*(?=\d{1,2}\/\d{1,2})/g,'、')
+    .split('、');
+  segs.forEach((seg,i)=>{
+    const lead=seg.match(DATE_LEAD);
+    if(!lead){                       // 沒有日期開頭：整段是描述，補給前面累積的日期
+      const t=noteTrim(seg);
+      if(t && pending.length){out.push({dates:pending,text:t});pending=[];}
+      return;
+    }
+    const head=noteTrim(lead[1]);    // 日期前面的引導詞，例如「報名」
+    const rest=noteTrim(seg.slice(lead[0].length));
+    const dates=[];
+    lead[2].replace(new RegExp(DATE_ONE.source,'g'),(...a)=>{dates.push(noteIso(a));return ''});
+    if(head && i===0 && !rest) prefix=head;
+    if(rest){ out.push({dates:pending.concat(dates),text:(i===0?head:'')+rest}); pending=[]; }
+    else pending=pending.concat(dates);
+  });
+  if(pending.length){
+    const rest=noteTrim(prefix||String(content).replace(new RegExp(DATE_ONE.source,'g'),''));
+    if(rest) out.push({dates:pending,text:rest});   // 只有日期、沒有內容就不列（沒東西可講）
+  }
+  return out.filter(x=>{
+    const t=noteTrim(x.text);
+    return t && (CONFIG.SKIP_NOTES||[]).indexOf(t)<0;
+  });
+}
+/* 掃過全部備註，做出三份索引 */
+function buildNoteIndex(data){
+  const byNameDate=new Map();   // 「姓名@日期」→ [內容]
+  const byDate=new Map();       // 日期 → [{names,text}]
+  const undated=[];             // 沒寫日期的整則，只放進下方清單
+  const seen=new Set();
+  (data.days||[]).forEach(d=>(d.notes||[]).forEach(cellText=>{
+    String(cellText).split(/\r?\n/).forEach(line=>{
+      const v=noteTrim(line);
+      if(!v || seen.has(v))return;
+      seen.add(v);
+      const mm=v.match(/^([^：:]{1,24})[：:]\s*(.+)$/);
+      const names=mm ? mm[1].split(/[、,，\/]+/).map(x=>x.trim()).filter(Boolean) : [];
+      const content=mm ? mm[2] : v;
+      const parts=DATE_ONE.test(content) ? splitByDate(content) : [];
+      if(!parts.length){
+        if((CONFIG.SKIP_NOTES||[]).indexOf(noteTrim(content))<0) undated.push({names,text:content,raw:v});
+        return;
+      }
+      parts.forEach(part=>part.dates.forEach(iso=>{
+        if(!byDate.has(iso))byDate.set(iso,[]);
+        byDate.get(iso).push({names,text:part.text});
+        names.forEach(n=>{
+          const k=n+'@'+iso;
+          if(!byNameDate.has(k))byNameDate.set(k,[]);
+          if(byNameDate.get(k).indexOf(part.text)<0)byNameDate.get(k).push(part.text);
+        });
+      }));
     });
   }));
-  return m;
+  return {byNameDate,byDate,undated};
 }
+function notesFor(name,iso){ return noteIdx.byNameDate.get(name+'@'+iso)||null; }
 
-/* 備註改成表格下方的清單：一格裡用換行分開的多則會被拆成多行，
-   「姓名：內容」的姓名會加粗，方便掃。 */
+/* 表格下方的備註清單：依日期分組列出，沒寫日期的收在最後 */
 function buildNotes(data){
   const box=$('notesBox');
   if(!box)return;
-  const items=[];
+  const order=[];                      // 先照班表上的日期順序
+  const label=new Map();
   (data.days||[]).forEach(d=>{
-    (d.notes||[]).forEach(t=>{
-      String(t).split(/\r?\n/).forEach(line=>{
-        const v=line.trim();
-        if(v && items.indexOf(v)<0) items.push(v);
-      });
-    });
+    if(d.isoDate && order.indexOf(d.isoDate)<0){
+      order.push(d.isoDate);
+      label.set(d.isoDate,String(d.dateText||'').split(/\r?\n/)[0].trim());
+    }
   });
-  if(!items.length){box.hidden=true;box.innerHTML='';return;}
-  box.innerHTML='<div class="notes-head">備註</div><div class="notes-list">'+
-    items.map(t=>{
-      const m=t.match(/^([^：:]{1,12})[：:]\s*(.+)$/);
-      return '<div class="note-item">'+
-        (m ? '<b>'+esc(m[1])+'</b>：'+esc(m[2]) : esc(t))+'</div>';
-    }).join('')+'</div>';
+  [...noteIdx.byDate.keys()].sort().forEach(iso=>{   // 班表上沒有的日期排在後面
+    if(order.indexOf(iso)<0){order.push(iso);label.set(iso,iso.slice(5).replace('-','/'));}
+  });
+  let html='';
+  order.forEach(iso=>{
+    const list=noteIdx.byDate.get(iso);
+    if(!list||!list.length)return;
+    html+='<div class="note-day'+(iso===data.today?' now':'')+'">'+
+      '<div class="nd-date">'+esc(label.get(iso)||iso)+
+      (iso===data.today?'<span class="nd-today">今天</span>':'')+'</div>'+
+      '<div class="nd-items">'+list.map(it=>
+        '<div class="note-item">'+(it.names.length?'<b>'+esc(it.names.join('、'))+'</b>：':'')+
+        esc(it.text)+'</div>').join('')+'</div></div>';
+  });
+  if(noteIdx.undated.length){
+    html+='<div class="note-day"><div class="nd-date">其他</div><div class="nd-items">'+
+      noteIdx.undated.map(it=>
+        '<div class="note-item">'+(it.names.length?'<b>'+esc(it.names.join('、'))+'</b>：':'')+
+        esc(it.text)+'</div>').join('')+'</div></div>';
+  }
+  if(!html){box.hidden=true;box.innerHTML='';return;}
+  box.innerHTML='<div class="notes-head">備註</div><div class="notes-list">'+html+'</div>';
   box.hidden=false;
 }
 function buildTable(data){
@@ -623,9 +703,11 @@ function buildTable(data){
       const p=(d.people||[]).find(x=>String(x.no)===String(label));
       let cell='<span class="empty">—</span>';
       if(p){
-        cell = noteByName.has(p.name)
-          ? `<button type="button" class="person has-note" data-name="${esc(p.name)}" `+
-            `aria-label="${esc(p.name)}，有備註，點開查看">${esc(p.name)}<span class="mk">註</span></button>`
+        cell = notesFor(p.name,d.isoDate)
+          ? `<button type="button" class="person has-note" data-name="${esc(p.name)}" data-date="${esc(d.isoDate)}" `+
+            `data-when="${esc(String(d.dateText||'').split('\n')[0].trim())}" `+
+            `aria-label="${esc(p.name)}，${esc(String(d.dateText||'').split('\n')[0].trim())}有備註，點開查看">`+
+            `${esc(p.name)}<span class="mk">註</span></button>`
           : `<span class="person">${esc(p.name)}</span>`;
       }
       return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">${cell}</td>`;
@@ -672,16 +754,13 @@ function renderSteps(){
   box.hidden=false;
 }
 
-let swipedOnce=false;   // 使用者左右滑過一次之後，提示就不再出現
-/* 表格右邊還有沒看到的日期時顯示右緣漸層；滑過一次就把提示收起來 */
+/* 表格右邊還有沒看到的日期時，右緣顯示一道漸層 */
 function updateScrollHint(){
   const sc=$('tableScroll');
   if(!sc||!sc.parentElement)return;
   const canScroll=sc.scrollWidth-sc.clientWidth>4;
   sc.parentElement.classList.toggle('more-right',
     canScroll && sc.scrollWidth-sc.clientWidth-sc.scrollLeft>4);
-  const hint=$('swipeHint');
-  if(hint)hint.classList.toggle('gone', swipedOnce || !canScroll);
 }
 
 /* ---------- 備註氣泡 ---------- */
@@ -731,15 +810,17 @@ function popTick(){
   popRaf=popBtn?requestAnimationFrame(popTick):0;
 }
 function openPop(btn){
-  const name=btn.dataset.name, list=noteByName.get(name);
+  const name=btn.dataset.name, list=notesFor(name,btn.dataset.date);
   if(!list||!list.length)return;
   const pop=$('pop');
-  $('popName').textContent=name;
+  $('popName').innerHTML=esc(name)+
+    (btn.dataset.when?'<span class="pop-when">'+esc(btn.dataset.when)+'</span>':'');
   $('popBody').innerHTML=list.map(t=>'<p>'+esc(t)+'</p>').join('');
   pop.hidden=false;          // 先顯示才量得到大小
   popBtn=btn;
   popLast='';
   pop.dataset.open='1';
+  pop.dataset.key=name+'@'+btn.dataset.date;
   positionPop();
   if(!popRaf)popRaf=requestAnimationFrame(popTick);
 }
@@ -750,6 +831,7 @@ function closePop(){
   popBtn=null;
   if(popRaf){cancelAnimationFrame(popRaf);popRaf=0;}
   delete pop.dataset.open;
+  delete pop.dataset.key;
 }
 
 /* ---------- 事件綁定 ---------- */
@@ -757,7 +839,7 @@ $('content').addEventListener('click',e=>{
   const btn=e.target.closest('.person.has-note');
   if(!btn)return;
   e.stopPropagation();
-  if($('pop').dataset.open==='1' && $('popName').textContent===btn.dataset.name){closePop();return;}
+  if($('pop').dataset.open==='1' && $('pop').dataset.key===btn.dataset.name+'@'+btn.dataset.date){closePop();return;}
   openPop(btn);
 });
 $('popX').addEventListener('click',closePop);
@@ -766,10 +848,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape')closePop(); });
 
-$('tableScroll').addEventListener('scroll',()=>{
-  if($('tableScroll').scrollLeft>8)swipedOnce=true;
-  updateScrollHint();
-},{passive:true});
+$('tableScroll').addEventListener('scroll',updateScrollHint,{passive:true});
 window.addEventListener('resize',updateScrollHint);
 renderSteps();
 </script>
