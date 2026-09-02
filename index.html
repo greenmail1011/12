@@ -329,9 +329,16 @@ const CONFIG = {
   CHECK_MS:30000,
   // 報名階段。until 是這個階段的最後一天（含）；最後一個階段的 until 設 null。
   // 系統會依台北時間自動切換，不用手動改。
-  // 備註內容只有這些字的，等於「沒有特別狀況」，不列也不加「註」
+  // 備註內容只有這些字的，等於「沒有特別狀況」，兩邊都不列
   // （時間列已經寫了全天，再寫一次是重複的）。要多濾就加進這個清單。
   SKIP_NOTES:['全天','整天','一整天','全日','正常','照常'],
+  // 職司：只放在表格下方的備註清單，表格裡的名字不加「註」。
+  // 內容扣掉這些字（和「報名」「安排」這類引導詞）之後沒剩東西，就算純職司。
+  DUTY_NOTES:['烹飪','維安','清潔'],
+  DUTY_LEAD:['報名','安排','負責','擔任','排','做'],
+  // 第二階段（職司初安排）開始前，職司備註整個先不顯示，這天起自動出現。
+  // 想提前公開就把日期改早，想一直顯示就設成 null。
+  DUTY_SHOW_FROM:'2026-09-14',
   PHASES:[
     { until:'2026-09-13', n:'①', wh:'即日起～9/13', lb:'向區中心報名了愿日期' },
     { until:'2026-09-18', n:'②', wh:'9/14～9/18',  lb:'職司初安排' },
@@ -611,6 +618,7 @@ function buildNoteIndex(data){
   const byDate=new Map();       // 日期 → [{names,text}]
   const undated=[];             // 沒寫日期的整則，只放進下方清單
   const seen=new Set();
+  const hideDuty=dutyHidden();
   (data.days||[]).forEach(d=>(d.notes||[]).forEach(cellText=>{
     String(cellText).split(/\r?\n/).forEach(line=>{
       const v=noteTrim(line);
@@ -621,12 +629,15 @@ function buildNoteIndex(data){
       const content=mm ? mm[2] : v;
       const parts=DATE_ONE.test(content) ? splitByDate(content) : [];
       if(!parts.length){
-        if((CONFIG.SKIP_NOTES||[]).indexOf(noteTrim(content))<0) undated.push({names,text:content,raw:v});
+        if((CONFIG.SKIP_NOTES||[]).indexOf(noteTrim(content))<0 && !(hideDuty && isDutyOnly(content)))
+          undated.push({names,text:content,raw:v});
         return;
       }
       parts.forEach(part=>part.dates.forEach(iso=>{
+        if(hideDuty && isDutyOnly(part.text))return;   // 第二階段前，職司整個不顯示
         if(!byDate.has(iso))byDate.set(iso,[]);
         byDate.get(iso).push({names,text:part.text});
+        if(isDutyOnly(part.text))return;      // 純職司只留在下方清單（表格不加「註」）
         names.forEach(n=>{
           const k=n+'@'+iso;
           if(!byNameDate.has(k))byNameDate.set(k,[]);
@@ -636,6 +647,20 @@ function buildNoteIndex(data){
     });
   }));
   return {byNameDate,byDate,undated};
+}
+/* 內容扣掉職司名稱和引導詞之後沒剩東西＝純職司安排，
+   這種只放下方清單，表格裡不加「註」（職司在下面看就好，不用每格點） */
+function isDutyOnly(text){
+  let t=noteTrim(text);
+  if(!t)return false;
+  (CONFIG.DUTY_NOTES||[]).forEach(w=>{t=t.split(w).join('')});
+  (CONFIG.DUTY_LEAD||[]).forEach(w=>{t=t.split(w).join('')});
+  return !t.replace(/[\s、,，。;；:：\/和與及跟]/g,'');
+}
+/* 第二階段還沒到之前，職司備註連下方清單都先藏起來 */
+function dutyHidden(){
+  const from=CONFIG.DUTY_SHOW_FROM;
+  return !!from && todayIso()<from;
 }
 function notesFor(name,iso){ return noteIdx.byNameDate.get(name+'@'+iso)||null; }
 
