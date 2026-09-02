@@ -664,10 +664,26 @@ function dutyHidden(){
 }
 function notesFor(name,iso){ return noteIdx.byNameDate.get(name+'@'+iso)||null; }
 
-/* 表格下方的備註清單：依日期分組列出，沒寫日期的收在最後 */
+/* 表格下方的備註清單：**只收「點名字看不到」的那幾則**。
+   名單上點得到的就不重複列，所以平常這一塊是空的、整塊自動隱藏；
+   只有這幾種才會冒出來：
+     - 職司（照設定不放在表格裡）
+     - 沒寫日期的（例如「曾玉錦：安排清潔」）
+     - 寫了某天、但那天班表上沒有這個人的格子 */
 function buildNotes(data){
   const box=$('notesBox');
   if(!box)return;
+  // 每一天班表上有誰，用來判斷那則備註在表格裡點不點得到
+  const roster=new Map();
+  (data.days||[]).forEach(d=>{
+    if(d.isoDate)roster.set(d.isoDate,new Set((d.people||[]).map(x=>x.name)));
+  });
+  const covered=(iso,it)=>(it.names||[]).some(n=>{
+    const set=roster.get(iso);
+    if(!set||!set.has(n))return false;
+    const l=notesFor(n,iso);
+    return !!l && l.indexOf(it.text)>=0;
+  });
   const order=[];                      // 先照班表上的日期順序
   const label=new Map();
   (data.days||[]).forEach(d=>{
@@ -681,8 +697,8 @@ function buildNotes(data){
   });
   let html='';
   order.forEach(iso=>{
-    const list=noteIdx.byDate.get(iso);
-    if(!list||!list.length)return;
+    const list=(noteIdx.byDate.get(iso)||[]).filter(it=>!covered(iso,it));
+    if(!list.length)return;
     html+='<div class="note-day'+(iso===data.today?' now':'')+'">'+
       '<div class="nd-date">'+esc(label.get(iso)||iso)+
       (iso===data.today?'<span class="nd-today">今天</span>':'')+'</div>'+
@@ -697,7 +713,7 @@ function buildNotes(data){
         esc(it.text)+'</div>').join('')+'</div></div>';
   }
   if(!html){box.hidden=true;box.innerHTML='';return;}
-  box.innerHTML='<div class="notes-head">備註</div><div class="notes-list">'+html+'</div>';
+  box.innerHTML='<div class="notes-head">其他備註</div><div class="notes-list">'+html+'</div>';
   box.hidden=false;
 }
 function buildTable(data){
