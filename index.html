@@ -571,13 +571,39 @@ function render(data){
       （「9/27(日)、9/28(一)全天」＝兩天都是全天）
    5. 整則都沒有寫日期的（例如「曾玉錦：安排清潔」）不掛在任何一天，只留在下方清單 */
 const DATE_ONE=/(\d{1,2})\/(\d{1,2})(?:\s*\([^)]{0,6}\))?/;
-const DATE_LEAD=new RegExp('^\\s*([^\\d：:]{0,4}?)((?:'+DATE_ONE.source+'\\s*[、,，]?\\s*)+)');
+// 日期之間可以用「、」「,」隔開，也可以用「~ ～ - – — 至 到」表示區間
+const DATE_SEP='\\s*(?:[、,，~～〜\\-–—]|至|到)?\\s*';
+const DATE_LEAD=new RegExp('^\\s*([^\\d：:]{0,4}?)('+DATE_ONE.source+
+  '(?:'+DATE_SEP+DATE_ONE.source+')*)');
+const RANGE_GAP=/^\s*(?:[~～〜\-–—]|至|到)\s*$/;
 
 function noteIso(mm){
   return '2026-'+String(+mm[1]).padStart(2,'0')+'-'+String(+mm[2]).padStart(2,'0');
 }
 function noteTrim(t){
   return String(t||'').replace(/^[\s、,，。:：]+|[\s、,，]+$/g,'').trim();
+}
+/* 把「9/27~10/4」這種區間展開成每一天 */
+function expandRange(a,b){
+  const out=[], s=Date.parse(a+'T00:00:00Z'), e=Date.parse(b+'T00:00:00Z');
+  if(isNaN(s)||isNaN(e)||e<s)return [a,b];
+  for(let t=s;t<=e && out.length<60;t+=86400000){
+    out.push(new Date(t).toISOString().slice(0,10));
+  }
+  return out;
+}
+/* 從一串日期（可能含區間）取出所有日期 */
+function datesFromRun(run){
+  const out=[], toks=[], re=new RegExp(DATE_ONE.source,'g');
+  let m;
+  while((m=re.exec(run))) toks.push({iso:noteIso(m),start:m.index,end:re.lastIndex});
+  const add=d=>{ if(out.indexOf(d)<0)out.push(d); };
+  toks.forEach((t,i)=>{
+    if(i>0 && RANGE_GAP.test(run.slice(toks[i-1].end,t.start))){
+      expandRange(toks[i-1].iso,t.iso).forEach(add);   // 區間：中間每一天都算
+    }else add(t.iso);
+  });
+  return out;
 }
 /* 把一則備註的內容拆成 [{dates:[iso],text}] */
 function splitByDate(content){
@@ -597,8 +623,7 @@ function splitByDate(content){
     }
     const head=noteTrim(lead[1]);    // 日期前面的引導詞，例如「報名」
     const rest=noteTrim(seg.slice(lead[0].length));
-    const dates=[];
-    lead[2].replace(new RegExp(DATE_ONE.source,'g'),(...a)=>{dates.push(noteIso(a));return ''});
+    const dates=datesFromRun(lead[2]);
     if(head && i===0 && !rest) prefix=head;
     if(rest){ out.push({dates:pending.concat(dates),text:(i===0?head:'')+rest}); pending=[]; }
     else pending=pending.concat(dates);
