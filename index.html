@@ -145,6 +145,16 @@ h1 .t-date,h1 .t-name{display:block}
 .note-item+.note-item{margin-top:5px}
 .note-item b{color:var(--ink);font-weight:900}
 
+/* 第二階段：職司表 */
+.duty-sum{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:13px;
+  box-shadow:var(--shadow);overflow:hidden}
+.duty-sum[hidden]{display:none}
+.ds-head{padding:11px 16px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);
+  border-bottom:1px solid var(--line);color:#1c4c6d;font-size:19px;font-weight:900}
+.ds-scroll{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;scroll-padding-left:88px}
+.ds-scroll .date-row .day-col{scroll-snap-align:start}
+
 /* 折疊區：職司說明 */
 .folds{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;margin:12px 0 4px}
 details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
@@ -283,6 +293,8 @@ tr.d-none.alt .row-label{background:#d5e4f1}
   .folds{gap:8px}
   details.fold>summary{font-size:17px;padding:12px 13px}
   .fold-body{padding:11px 13px 13px}
+  .ds-head{font-size:17px;padding:10px 13px}
+  .ds-scroll{scroll-padding-left:72px}
   .notes-head{font-size:17px;padding:10px 13px}
   .notes-list{padding:2px 13px 8px}
   .note-day{gap:10px;padding:10px 0}
@@ -350,6 +362,7 @@ tr.d-none.alt .row-label{background:#d5e4f1}
     </div>
   </div>
   <div class="notes-box" id="notesBox" hidden></div>
+  <div class="duty-sum" id="dutySum" hidden></div>
   <div class="folds">
     <details class="fold">
       <summary>第二階段：職司規劃說明</summary>
@@ -679,6 +692,7 @@ function render(data){
   $('content').className='';
   $('content').innerHTML=buildTable(data);
   buildLegend(data);
+  buildDutyTable(data);
   buildNotes(data);
   updateScrollHint();
 }
@@ -862,12 +876,8 @@ function buildNotes(data){
 }
 function buildTable(data){
   if(!data.days.length)return '<div class="status">目前沒有勤務資料。</div>';
-  const nDay=data.days.length;
-  const labelCols=data.hasDuty?2:1;      // 左邊固定幾欄（職司＋人數 / 只有編號）
   const gs=groupSpans(data.days);
-  const head=(cls,label,cellsHtml)=>
-    `<tr class="${cls}"><th class="corner" colspan="${labelCols}">${label}</th>${cellsHtml}</tr>`;
-
+  const head=(cls,label,cells)=>`<tr class="${cls}"><th class="corner">${label}</th>${cells}</tr>`;
   const groupHtml=gs.map(g=>
     `<th class="day-col ${g.start?'group-start':''}" colspan="${g.span}">${esc(g.name)}</th>`).join('');
   const dateHtml=data.days.map((d,i)=>
@@ -883,35 +893,16 @@ function buildTable(data){
     `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
       <span class="cnt${d.filled?'':' cnt-zero'}">${d.filled} 人</span>
     </th>`).join('');
-
-  let body='';
-  (data.blocks||[]).forEach(blk=>{
-    const k=dutyKey(blk.duty);
-    blk.rows.forEach((row,ri)=>{
-      const tds=data.days.map((d,i)=>{
-        const cell=row.cells[i]||{name:'',marks:[]};
-        let html='<span class="empty">—</span>';
-        if(cell.name){
-          const ico=(cell.marks||[]).map(m=>
-            `<span class="mk mk-${m.key}" aria-label="${esc(m.lb)}" title="${esc(m.lb)}">${esc(m.ico)}</span>`).join('');
-          const when=String(d.dateText||'').split('\n')[0].trim();
-          html = notesFor(cell.name,d.isoDate)
-            ? `<button type="button" class="person has-note" data-name="${esc(cell.name)}" data-date="${esc(d.isoDate)}" `+
-              `data-when="${esc(when)}" aria-label="${esc(cell.name)}，${esc(when)}有備註，點開查看">`+
-              `${ico}<span class="nm">${esc(cell.name)}</span><span class="mk mk-note">註</span></button>`
-            : `<span class="person">${ico}<span class="nm">${esc(cell.name)}</span></span>`;
-        }
-        return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">${html}</td>`;
-      }).join('');
-      const dutyCell=(data.hasDuty && ri===0)
-        ? `<th class="duty-label d-${k}" rowspan="${blk.rows.length}"><span>${esc(blk.duty||'　')}</span></th>`
-        : '';
-      body+=`<tr class="d-${k}${ri%2?' alt':''}${ri===0?' blk-top':''}">${dutyCell}`+
-            `<th class="row-label">${esc(row.no||'')}</th>${tds}</tr>`;
-    });
-  });
-
-  return `<table class="${data.hasDuty?'has-duty':''}">
+  // 這張只回答「誰哪幾天來」，所以不分職司、編號從頭數到尾
+  const body=(data.grid||[]).map((row,ri)=>{
+    const tds=data.days.map((d,i)=>{
+      const c=row.cells[i]||{name:'',marks:[]};
+      return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">`+
+        (c.name?personHtml(c,d):'<span class="empty">—</span>')+'</td>';
+    }).join('');
+    return `<tr class="d-none${ri%2?' alt':''}"><th class="row-label">${ri+1}</th>${tds}</tr>`;
+  }).join('');
+  return `<table>
     <thead>
       ${head('group-row','小組',groupHtml)}
       ${head('date-row','日期',dateHtml)}
@@ -921,6 +912,54 @@ function buildTable(data){
     <tbody>${body}</tbody>
   </table>`;
 }
+
+/* 名字格子：記號小圖示 +（那天有備註的話）可以點的「註」。兩張表共用 */
+function personHtml(cell,d){
+  const ico=(cell.marks||[]).map(m=>
+    `<span class="mk mk-${m.key}" aria-label="${esc(m.lb)}" title="${esc(m.lb)}">${esc(m.ico)}</span>`).join('');
+  const when=String(d.dateText||'').split('\n')[0].trim();
+  return notesFor(cell.name,d.isoDate)
+    ? `<button type="button" class="person has-note" data-name="${esc(cell.name)}" data-date="${esc(d.isoDate)}" `+
+      `data-when="${esc(when)}" aria-label="${esc(cell.name)}，${esc(when)}有備註，點開查看">`+
+      `${ico}<span class="nm">${esc(cell.name)}</span><span class="mk mk-note">註</span></button>`
+    : `<span class="person">${ico}<span class="nm">${esc(cell.name)}</span></span>`;
+}
+
+/* 第二階段的職司表：左邊職司分塊、每塊自己編號、上面八天 —— 就是紙本那張的排法。
+   上面那張大表是「誰哪幾天來」，這張是「職司怎麼分」。 */
+function buildDutyTable(data){
+  const box=$('dutySum');
+  if(!box)return;
+  const blocks=(data.blocks||[]).filter(b=>b.duty);
+  if(!data.hasDuty || !blocks.length){ box.hidden=true; box.innerHTML=''; return; }
+  const dateHtml=data.days.map(d=>
+    `<th class="day-col ${todayClass(d,data)}">${esc(d.dateText).replace(/\r?\n/g,'<br>')}`+
+    `${d.isoDate===data.today?'<span class="today-mark">今天</span>':''}</th>`).join('');
+  const cntHtml=data.days.map(d=>
+    `<th class="day-col ${todayClass(d,data)}"><span class="cnt">${
+      (d.people||[]).filter(p=>p.duty).length} 人</span></th>`).join('');
+  let body='';
+  blocks.forEach(blk=>{
+    const k=dutyKey(blk.duty);
+    blk.rows.forEach((row,ri)=>{
+      const tds=data.days.map((d,i)=>{
+        const c=row.cells[i]||{name:'',marks:[]};
+        return `<td class="day-col ${todayClass(d,data)}">`+
+          (c.name?personHtml(c,d):'<span class="empty">—</span>')+'</td>';
+      }).join('');
+      body+=`<tr class="d-${k}${ri%2?' alt':''}${ri===0?' blk-top':''}">`+
+        (ri===0?`<th class="duty-label d-${k}" rowspan="${blk.rows.length}"><span>${esc(blk.duty)}</span></th>`:'')+
+        `<th class="row-label">${esc(row.no||String(ri+1))}</th>${tds}</tr>`;
+    });
+  });
+  box.innerHTML='<div class="ds-head">第二階段：職司表</div>'+
+    '<div class="ds-scroll"><table class="has-duty">'+
+    '<thead><tr class="date-row"><th class="corner" colspan="2">日期</th>'+dateHtml+'</tr>'+
+    '<tr class="count-row"><th class="corner" colspan="2">人數</th>'+cntHtml+'</tr></thead>'+
+    '<tbody>'+body+'</tbody></table></div>';
+  box.hidden=false;
+}
+
 /* 表格上方的記號說明，只列出名單裡真的用到的 */
 function buildLegend(data){
   const box=$('legend');
@@ -1045,7 +1084,7 @@ function closePop(){
 }
 
 /* ---------- 事件綁定 ---------- */
-$('content').addEventListener('click',e=>{
+document.addEventListener('click',e=>{     // 兩張表都要能點，所以綁在 document
   const btn=e.target.closest('.person.has-note');
   if(!btn)return;
   e.stopPropagation();
@@ -1054,7 +1093,7 @@ $('content').addEventListener('click',e=>{
 });
 $('popX').addEventListener('click',closePop);
 document.addEventListener('click',e=>{
-  if($('pop').dataset.open==='1' && !e.target.closest('#pop'))closePop();
+  if($('pop').dataset.open==='1' && !e.target.closest('#pop') && !e.target.closest('.person.has-note'))closePop();
 });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape')closePop(); });
 
