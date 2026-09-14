@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>職司分配｜彌勒山12人小組</title>
+<meta name="robots" content="noindex">
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
+:root{
+  --bg:#eef5fb; --ink:#1b2b38; --muted:#63798a; --line:#c9dced;
+  --brand:#6fa8d4; --brand-dark:#2f6f9e; --brand-soft:#dceaf6;
+  --shadow:0 1px 3px rgba(20,60,95,.09);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:14px 12px 120px}
+h1{margin:0 0 4px;font-size:25px;line-height:1.3}
+.sub{color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:12px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.btn{appearance:none;border:1px solid var(--brand-dark);background:#fff;color:var(--brand-dark);
+  font:inherit;font-weight:900;font-size:16px;padding:9px 16px;border-radius:10px;cursor:pointer}
+.btn:hover{background:var(--brand-soft)}
+.btn.main{background:var(--brand-dark);color:#fff}
+.btn.main:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:default}
+.msg{font-size:15px;color:var(--muted);min-height:22px;line-height:1.5}
+.msg.ok{color:#1d6b45;font-weight:900}
+.msg.err{color:#8f3f34;font-weight:900}
+
+.group{background:#fff;border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);
+  margin-bottom:12px;overflow:hidden}
+.ghead{display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:19px;font-weight:900;
+  border-bottom:1px solid var(--line)}
+.ghead .n{margin-left:auto;font-size:15px;font-weight:900;color:var(--muted)}
+.g-cook .ghead{background:#f4dcbd;color:#6b4416}
+.g-clean .ghead{background:#cfe0f2;color:#1c4c6d}
+.g-guard .ghead{background:#d8e8d6;color:#2b5730}
+.g-none .ghead{background:#e9edf1;color:#4b5b68}
+.rows{min-height:52px;padding:6px}
+.rows.over{background:var(--brand-soft)}
+.empty-hint{padding:12px 8px;color:#9fb2c1;font-size:15px;text-align:center}
+
+.row{display:flex;align-items:center;gap:9px;padding:9px 10px;margin:4px 0;
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  touch-action:none;user-select:none;cursor:grab}
+.row:active{cursor:grabbing}
+.row.drag{position:fixed;z-index:99;width:auto;box-shadow:0 12px 28px rgba(16,48,74,.3);
+  opacity:.96;pointer-events:none;cursor:grabbing}
+.ph{margin:4px 0;border:2px dashed var(--brand);border-radius:10px;background:var(--brand-soft)}
+.grip{flex:0 0 auto;color:#9fb2c1;font-size:19px;line-height:1;letter-spacing:-2px}
+.nm{font-size:20px;font-weight:900;white-space:nowrap}
+.days{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto}
+.d{font-size:12.5px;font-weight:900;color:#43606f;background:#eef4f9;
+  border:1px solid #d8e6f0;border-radius:6px;padding:2px 6px;white-space:nowrap}
+.qk{display:flex;gap:4px;flex:0 0 auto}
+.qk button{appearance:none;border:1px solid var(--line);background:#fff;color:#5a6c7a;
+  font:inherit;font-size:13px;font-weight:900;padding:4px 7px;border-radius:7px;cursor:pointer}
+.qk button:hover{background:var(--brand-soft);color:var(--brand-dark)}
+.qk button.on{background:var(--brand-dark);color:#fff;border-color:var(--brand-dark)}
+
+.out{width:100%;height:150px;margin-top:6px;font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:12.5px;line-height:1.5;padding:9px;border:1px solid var(--line);border-radius:10px}
+details.how{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:12px}
+details.how>summary{cursor:pointer;padding:11px 14px;font-size:17px;font-weight:900;color:#1c4c6d;list-style:none}
+details.how>summary::-webkit-details-marker{display:none}
+details.how>summary::after{content:'\25BE';float:right;color:#4c7ea6}
+details.how[open]>summary::after{content:'\25B4'}
+.how-body{padding:0 14px 14px;font-size:15.5px;line-height:1.75;color:#3f5262}
+.how-body ol{margin:6px 0;padding-left:22px}
+.how-body code{background:#eef4f9;padding:1px 5px;border-radius:5px;font-size:14px}
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(238,245,251,.96);border-top:1px solid var(--line);
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
+  display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+@media(max-width:560px){
+  .row{gap:7px;padding:8px}
+  .nm{font-size:18px}
+  .days{width:100%;margin-left:0;order:9}
+  .qk{order:8;margin-left:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>職司分配</h1>
+  <div class="sub">名單直接從 Google 試算表讀進來。<b>上下拖</b>名字，或按右邊的 烹／清／維 直接指定，
+    一次就把那個人<b>所有排到的日期</b>都改好。改完按最下面的「複製表格」，貼回試算表。</div>
+
+  <details class="how">
+    <summary>怎麼貼回試算表？</summary>
+    <div class="how-body">
+      <ol>
+        <li>按「<b>複製表格</b>」（複製失敗的話，下面文字框裡的內容全選複製也一樣）</li>
+        <li>回到 Google 試算表，點 <code>A5</code> 這一格</li>
+        <li>直接貼上（Ctrl/⌘ + V）</li>
+      </ol>
+      貼上會蓋掉 A5 開始的名單區，<b>備註列不會被動到</b>（它在名單下面，貼上的內容不含備註）。
+      貼之前建議先「檔案 → 版本記錄」留個版本，反悔隨時還原得回來。
+      <br><br>同一個人不同天要不同職司（例如前兩天清潔、後兩天維安）這頁還做不到，
+      貼回去之後在試算表手動調那幾格就好。
+    </div>
+  </details>
+
+  <div class="bar">
+    <button class="btn" id="reload">重新讀取名單</button>
+    <span class="msg" id="msg">正在讀取…</span>
+  </div>
+
+  <div id="groups"></div>
+
+  <textarea class="out" id="out" readonly placeholder="按「複製表格」後，要貼回試算表的內容會出現在這裡"></textarea>
+</div>
+
+<div class="foot">
+  <button class="btn main" id="copy">複製表格</button>
+  <span class="msg" id="msg2"></span>
+</div>
+
+<script>
+const CONFIG={
+  SPREADSHEET_ID:'1GEE-2ISgzqAca-SblK2SSu8e7a_rlwyrkjH73wiHiW4',
+  DATA_GID:'303688467'
+};
+const DUTIES=[
+  {name:'烹飪',key:'cook'},
+  {name:'清潔',key:'clean'},
+  {name:'維安',key:'guard'},
+  {name:'',    key:'none', label:'未分配'}
+];
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+let DAYS=[], PEOPLE=[];     // PEOPLE: {raw, name, days:[dayIndex], duty}
+
+/* ---------- 讀試算表 ---------- */
+google.charts.load('current',{packages:['table']});
+google.charts.setOnLoadCallback(load);
+$('reload').addEventListener('click',load);
+
+function load(){
+  say('正在讀取…','');
+  const url='https://docs.google.com/spreadsheets/d/'+CONFIG.SPREADSHEET_ID+
+    '/gviz/tq?gid='+encodeURIComponent(CONFIG.DATA_GID)+'&range=A1:L100&headers=1&_='+Date.now();
+  const q=new google.visualization.Query(url);
+  q.setQuery('select *');
+  q.send(res=>{
+    if(res.isError()){say('讀取失敗：'+res.getMessage(),'err');return;}
+    try{ parse(toRows(res.getDataTable())); render();
+      say('讀到 '+PEOPLE.length+' 個人、'+DAYS.length+' 天。','ok');
+    }catch(err){ say('資料看不懂：'+err.message,'err'); }
+  });
+}
+function toRows(dt){
+  const rows=[],h=[];
+  for(let c=0;c<dt.getNumberOfColumns();c++)h.push(String(dt.getColumnLabel(c)||''));
+  rows.push(h);
+  for(let r=0;r<dt.getNumberOfRows();r++){
+    const row=[];
+    for(let c=0;c<dt.getNumberOfColumns();c++){
+      let v=dt.getFormattedValue(r,c);
+      if(v==null||v==='') {const raw=dt.getValue(r,c); v=raw==null?'':String(raw);}
+      row.push(String(v??''));
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+const cell=(rows,r,c)=>String((rows[r]&&rows[r][c])??'');
+function findDayStart(rows){
+  for(let r=1;r<Math.min(5,rows.length);r++)
+    for(let c=0;c<6;c++)
+      if(/\d{1,2}\s*\/\s*\d{1,2}/.test(cell(rows,r,c)))return c;
+  return 1;
+}
+function parse(rows){
+  if(!rows||rows.length<5)throw new Error('沒有讀到完整名單');
+  const dayStart=findDayStart(rows);
+  const numCol=Math.max(0,dayStart-1);
+  const dutyCol=dayStart>=2?dayStart-2:-1;
+  // 備註列在哪
+  let noteIndex=-1;
+  for(let r=4;r<rows.length&&noteIndex<0;r++)
+    for(let c=0;c<=numCol;c++) if(cell(rows,r,c).trim()==='備註'){noteIndex=r;break;}
+  if(noteIndex<0){
+    let last=-1;
+    for(let r=4;r<rows.length;r++) if(cell(rows,r,numCol).trim())last=r;
+    noteIndex=last>=0?last+1:rows.length;
+  }
+  DAYS=[];
+  for(let i=0;i<8;i++){
+    const t=cell(rows,2,dayStart+i).trim();
+    if(t)DAYS.push({idx:i,text:t.split(/\r?\n/)[0].trim()});
+  }
+  const map=new Map();
+  let curDuty='';
+  for(let r=4;r<noteIndex;r++){
+    if(dutyCol>=0){const d=cell(rows,r,dutyCol).trim(); if(d)curDuty=d;}
+    DAYS.forEach((d,k)=>{
+      const raw=cell(rows,r,dayStart+d.idx).trim();
+      if(!raw)return;
+      const key=raw.replace(/^[◆◇#＃✱✳✽＊*※\s]+/,'').trim();
+      if(!key)return;
+      if(!map.has(key))map.set(key,{raw,name:key,days:[],duty:dutyCol>=0?curDuty:''});
+      const p=map.get(key);
+      if(raw.length>p.raw.length)p.raw=raw;      // 留住有記號的那個寫法
+      if(p.days.indexOf(k)<0)p.days.push(k);
+      if(!p.duty && dutyCol>=0)p.duty=curDuty;
+    });
+  }
+  PEOPLE=[...map.values()];
+  PEOPLE.forEach(p=>{ if(!DUTIES.some(d=>d.name===p.duty))p.duty=''; });
+}
+function say(t,cls){const el=$('msg');el.textContent=t;el.className='msg '+(cls||'')}
+
+/* ---------- 畫面 ---------- */
+function render(){
+  $('groups').innerHTML=DUTIES.map(d=>{
+    const list=PEOPLE.filter(p=>p.duty===d.name);
+    return `<section class="group g-${d.key}">
+      <div class="ghead"><span>${esc(d.label||d.name)}</span><span class="n">${list.length} 人</span></div>
+      <div class="rows" data-duty="${esc(d.name)}">${list.map(rowHtml).join('')||
+        '<div class="empty-hint">把名字拖到這裡</div>'}</div>
+    </section>`;
+  }).join('');
+}
+function rowHtml(p){
+  return `<div class="row" data-name="${esc(p.name)}">
+    <span class="grip">⣿</span>
+    <span class="nm">${esc(p.raw)}</span>
+    <span class="qk">${DUTIES.filter(d=>d.name).map(d=>
+      `<button type="button" data-to="${esc(d.name)}" class="${p.duty===d.name?'on':''}">${esc(d.name[0])}</button>`).join('')}</span>
+    <span class="days">${p.days.map(i=>`<span class="d">${esc(DAYS[i].text)}</span>`).join('')}</span>
+  </div>`;
+}
+/* 右邊小按鈕：直接指定職司 */
+$('groups').addEventListener('click',e=>{
+  const b=e.target.closest('.qk button'); if(!b)return;
+  const name=b.closest('.row').dataset.name;
+  const p=PEOPLE.find(x=>x.name===name); if(!p)return;
+  p.duty=(p.duty===b.dataset.to)?'':b.dataset.to;
+  render();
+});
+
+/* ---------- 上下拖拉 ---------- */
+let drag=null;
+$('groups').addEventListener('pointerdown',e=>{
+  if(e.target.closest('.qk'))return;
+  const row=e.target.closest('.row'); if(!row)return;
+  e.preventDefault();
+  const r=row.getBoundingClientRect();
+  const ph=document.createElement('div');
+  ph.className='ph'; ph.style.height=r.height+'px';
+  row.parentNode.insertBefore(ph,row);
+  row.classList.add('drag');
+  row.style.width=r.width+'px';
+  row.style.left=r.left+'px';
+  row.style.top=r.top+'px';
+  drag={row,ph,dx:e.clientX-r.left,dy:e.clientY-r.top};
+  row.setPointerCapture(e.pointerId);
+});
+$('groups').addEventListener('pointermove',e=>{
+  if(!drag)return;
+  drag.row.style.left=(e.clientX-drag.dx)+'px';
+  drag.row.style.top=(e.clientY-drag.dy)+'px';
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  if(!el)return;
+  document.querySelectorAll('.rows.over').forEach(x=>x.classList.remove('over'));
+  const box=el.closest('.rows')||el.closest('.group')?.querySelector('.rows');
+  if(!box)return;
+  box.classList.add('over');
+  const hint=box.querySelector('.empty-hint'); if(hint)hint.remove();
+  const rows=[...box.querySelectorAll('.row:not(.drag)')];
+  let before=null;
+  for(const r of rows){
+    const b=r.getBoundingClientRect();
+    if(e.clientY<b.top+b.height/2){before=r;break;}
+  }
+  box.insertBefore(drag.ph,before);
+});
+function endDrag(){
+  if(!drag)return;
+  const {row,ph}=drag;
+  row.classList.remove('drag');
+  row.style.cssText='';
+  ph.parentNode.insertBefore(row,ph);
+  ph.remove();
+  document.querySelectorAll('.rows.over').forEach(x=>x.classList.remove('over'));
+  drag=null;
+  syncOrder();
+}
+$('groups').addEventListener('pointerup',endDrag);
+$('groups').addEventListener('pointercancel',endDrag);
+
+/* 把畫面上的順序寫回資料 */
+function syncOrder(){
+  const out=[];
+  document.querySelectorAll('.rows').forEach(box=>{
+    const duty=box.dataset.duty;
+    box.querySelectorAll('.row').forEach(r=>{
+      const p=PEOPLE.find(x=>x.name===r.dataset.name);
+      if(p){p.duty=duty;out.push(p)}
+    });
+  });
+  if(out.length===PEOPLE.length)PEOPLE=out;
+  render();
+}
+
+/* ---------- 產生要貼回去的表格 ---------- */
+function buildTSV(){
+  const lines=[];
+  DUTIES.forEach(d=>{
+    const list=PEOPLE.filter(p=>p.duty===d.name);
+    const label=d.label||d.name;          // 還沒分的那一塊要寫「未分配」，
+    list.forEach((p,i)=>{                 // 不然 A 欄空白會被當成接上面那一塊
+      const cells=DAYS.map((_,k)=>p.days.indexOf(k)>=0?p.raw:'');
+      lines.push([i===0?label:'',String(i+1)].concat(cells).join('\t'));
+    });
+  });
+  return lines.join('\n');
+}
+$('copy').addEventListener('click',async()=>{
+  const tsv=buildTSV();
+  $('out').value=tsv;
+  const n=tsv?tsv.split('\n').length:0;
+  const m=$('msg2');
+  if(!n){m.textContent='名單是空的。';m.className='msg err';return;}
+  const left=PEOPLE.filter(p=>!p.duty).length;
+  const tail=left?('　⚠ 還有 '+left+' 人未分配，會單獨列成「未分配」一塊'):'';
+  try{
+    await navigator.clipboard.writeText(tsv);
+    m.textContent='已複製 '+n+' 列（貼到 A5，會蓋到第 '+(4+n)+' 列）'+tail;
+    m.className='msg '+(left?'err':'ok');
+  }catch(err){
+    $('out').select();
+    m.textContent='瀏覽器擋住自動複製，請在下面文字框全選複製（共 '+n+' 列）';
+    m.className='msg err';
+  }
+});
+</script>
+</body>
+</html>

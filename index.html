@@ -86,13 +86,26 @@ h1 .t-date,h1 .t-name{display:block}
 
 /* 有備註的名字：可以點，點了在旁邊跳出小氣泡 */
 .person.has-note{appearance:none;border:0;background:none;font:inherit;color:inherit;
-  cursor:pointer;display:inline-flex;align-items:center;gap:5px;
+  cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex-wrap:nowrap;max-width:100%;
   padding:2px 6px;border-radius:9px;box-shadow:inset 0 -2px 0 rgba(47,111,158,.4)}
+.person{display:inline-flex;align-items:center;flex-wrap:nowrap;max-width:100%}
+.person .nm{min-width:0;overflow-wrap:anywhere}
 .person.has-note:hover{background:var(--brand-soft)}
 .person.has-note:focus-visible{outline:3px solid var(--brand-dark);outline-offset:1px}
-.person .mk{display:inline-grid;place-items:center;flex:0 0 auto;
+.mk{display:inline-grid;place-items:center;flex:0 0 auto;vertical-align:1px;
   width:19px;height:19px;border-radius:50%;background:var(--brand-dark);color:#fff;
   font-size:11px;font-weight:900;line-height:1}
+/* 名字前面的三種身分記號：長＝烹飪組長、聯＝聯絡窗口、供＝獻供人員 */
+.mk-lead{background:#d9a400;color:#3f2c00}
+.mk-link{background:#2f6f9e;color:#fff}
+.mk-offer{background:#c2557f;color:#fff}
+.person .mk-lead,.person .mk-link,.person .mk-offer{margin-right:3px}
+/* 表格上方的記號說明 */
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 2px 8px;padding:8px 12px;
+  background:#fff;border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow);
+  font-size:15px;font-weight:800;color:#3f5262}
+.legend[hidden]{display:none}
+.lg{display:inline-flex;align-items:center;gap:5px}
 
 /* 備註氣泡：用 fixed 定位，才不會被會左右捲動的表格裁掉 */
 .pop{position:fixed;z-index:200;max-width:min(330px,calc(100vw - 24px));
@@ -191,13 +204,47 @@ details.fold>summary:focus-visible{outline:3px solid var(--brand-dark);outline-o
   scroll-snap-type:x proximity;scroll-padding-left:58px}
 /* 左右滑動吸附到整欄日期，不會停在半欄 */
 .date-row .day-col{scroll-snap-align:start}
-/* 左右滑時編號欄固定在最左邊 */
-.corner,.row-label{position:sticky;left:0;z-index:2}
+/* 左右滑時，左邊的職司欄和編號欄都固定住 */
+.corner,.duty-label{position:sticky;left:0;z-index:3}
+.row-label{position:sticky;left:0;z-index:2}
+table.has-duty .row-label{left:30px}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;table-layout:fixed;background:#fff}
 th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
 tr>*:last-child{border-right:0}
 tbody tr:last-child>*{border-bottom:0}
 .corner,.row-label{width:58px;min-width:58px;max-width:58px;background:#e6eff7;font-weight:900}
+/* 職司欄：直書，佔的寬度才小 */
+.duty-label{width:30px;min-width:30px;max-width:30px;padding:5px 1px;
+  font-size:19px;font-weight:900;line-height:1.15;color:#3c4a57;
+  background:#eef2f6;border-right:1px solid var(--line);vertical-align:middle}
+.duty-label>span{display:inline-block;word-break:break-all}
+.duty-label.d-cook{background:#f4dcbd;color:#6b4416}
+.duty-label.d-clean{background:#cfe0f2;color:#1c4c6d}
+.duty-label.d-guard{background:#d8e8d6;color:#2b5730}
+.duty-label.d-other{background:#e6e2ef;color:#463a5e}
+.duty-label.d-todo{background:#e7e9ec;color:#5d6a76}
+/* 每個職司區塊自己的底色，隔行再深一點，橫向對照才不會看錯列 */
+tr.d-cook  td:not(.today-col){background:#fdf4e9}
+tr.d-cook.alt  td:not(.today-col){background:#f8e9d6}
+tr.d-cook .row-label{background:#f0e0c9}
+tr.d-cook.alt .row-label{background:#e9d3b5}
+tr.d-clean td:not(.today-col){background:#f1f7fd}
+tr.d-clean.alt td:not(.today-col){background:#e2edf9}
+tr.d-clean .row-label{background:#d9e7f4}
+tr.d-clean.alt .row-label{background:#cbdcee}
+tr.d-guard td:not(.today-col){background:#f2f8f1}
+tr.d-guard.alt td:not(.today-col){background:#e5f0e4}
+tr.d-guard .row-label{background:#dbe9d9}
+tr.d-guard.alt .row-label{background:#cde0cb}
+tr.d-other td:not(.today-col){background:#f7f5fb}
+tr.d-other.alt td:not(.today-col){background:#efebf7}
+/* 還沒分職司的先放這塊，灰灰的一眼看得出還沒做完 */
+tr.d-todo td:not(.today-col){background:#f6f7f8}
+tr.d-todo.alt td:not(.today-col){background:#eef0f2}
+tr.d-todo .row-label{background:#e4e7ea}
+tr.d-todo.alt .row-label{background:#dadee2}
+/* 區塊之間畫一條粗線分開 */
+tr.blk-top>*{border-top:3px solid #9cb3c6}
 .group-row th{height:52px;padding:7px 8px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);color:#1c4c6d;font-size:23px;font-weight:900;line-height:1.28;white-space:nowrap;vertical-align:middle}
 .date-row th{height:64px;padding:7px 8px;background:linear-gradient(180deg,#f8fbfe 0%,#e0eef9 100%);font-size:23px;font-weight:900;white-space:nowrap;line-height:1.28;text-align:center;vertical-align:middle}
 .time-row th{height:88px;padding:8px 7px;background:#f9fcfe;color:#2c6b96;font-size:16px;line-height:1.55;font-weight:900;white-space:normal;overflow:visible;vertical-align:middle}
@@ -211,9 +258,9 @@ tbody tr:last-child>*{border-bottom:0}
 .date-row .today-col{background:var(--today-head)!important;color:#0f4266}
 .today-mark{display:block;margin-top:2px;font-size:10px;color:#0f4266;font-weight:900}
 tbody td{height:60px;padding:9px 8px;background:#fff;font-size:22px;line-height:1.3;word-break:break-word}
-/* 隔行底色：橫向對照時不容易看錯列 */
-tbody tr:nth-child(even) td:not(.today-col){background:var(--stripe)}
-tbody tr:nth-child(even) .row-label{background:#d5e4f1}
+/* 沒有職司欄時（舊版面）維持原本的隔行底色 */
+tr.d-none.alt td:not(.today-col){background:var(--stripe)}
+tr.d-none.alt .row-label{background:#d5e4f1}
 .person{font-size:22px;font-weight:900}
 .empty{color:#bccbd7}
 .group-start{border-left:3px solid #9cc6e5!important}
@@ -242,8 +289,9 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
   .note-day.now{margin:0 -8px;padding-left:8px;padding-right:8px}
   .nd-date{flex-basis:74px;font-size:16px}
   .note-item{font-size:16px}
-  .person .mk{width:17px;height:17px;font-size:10px}
-  .person.has-note{gap:4px;padding:2px 4px}
+  .mk{width:15px;height:15px;font-size:9px}
+  .person .mk-lead,.person .mk-link,.person .mk-offer{margin-right:1px}
+  .person.has-note{gap:2px;padding:2px 2px;border-radius:7px}
   .pop{font-size:16px;padding:12px 32px 12px 14px}
   .r{flex-direction:column;gap:3px;padding:10px 6px;font-size:16px}
   .shell{border-radius:10px}
@@ -261,15 +309,18 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
   .scroll{max-height:none}
   /* 手機：欄位縮小，一次看得到 3 天 */
   /* 編號欄再寬 4px，「小組」「日期」才不會被擠成兩行 */
-  .corner,.row-label{width:44px;min-width:44px;max-width:44px;font-size:13px}
-  .scroll{scroll-padding-left:44px}
-  .day-col{width:110px;min-width:110px;max-width:110px}
+  .corner,.row-label{width:32px;min-width:32px;max-width:32px;font-size:13px}
+  .duty-label{width:22px;min-width:22px;max-width:22px;font-size:15px;padding:4px 0}
+  table.has-duty .row-label{left:22px}
+  .scroll{scroll-padding-left:32px}
+  .legend{font-size:14px;padding:7px 10px;gap:5px 12px;margin-bottom:7px}
+  .day-col{width:106px;min-width:106px;max-width:106px}
   .group-row th{height:38px;padding:5px 3px;font-size:17px;line-height:1.3}
   .date-row th{height:auto;padding:7px 3px;font-size:17px;line-height:1.3}
   .time-row th{height:auto;padding:7px 3px;font-size:13px;line-height:1.45;overflow:visible}
   .count-row th{height:36px;padding:5px 3px;font-size:13px}
   tbody td{height:44px;padding:6px 3px;font-size:17px}
-  .person{font-size:17px;font-weight:900}
+  .person{font-size:16.5px;font-weight:900}
   .today-mark{font-size:9px;margin-top:1px}
   .footer{font-size:13px;line-height:1.5}
 }
@@ -292,6 +343,7 @@ tbody tr:nth-child(even) .row-label{background:#d5e4f1}
   </div>
   <div class="warnbar" id="warnbar" hidden></div>
 
+  <div class="legend" id="legend" hidden></div>
   <div class="shell">
     <div class="scroll" id="tableScroll">
       <div id="content" class="status">正在讀取勤務表…</div>
@@ -332,13 +384,10 @@ const CONFIG = {
   // 備註內容只有這些字的，等於「沒有特別狀況」，兩邊都不列
   // （時間列已經寫了全天，再寫一次是重複的）。要多濾就加進這個清單。
   SKIP_NOTES:['全天','整天','一整天','全日','正常','照常'],
-  // 職司：只放在表格下方的備註清單，表格裡的名字不加「註」。
+  // 職司備註：職司已經用表格左邊的分塊呈現，備註再寫一次是重複的，所以整個不列。
   // 內容扣掉這些字（和「報名」「安排」這類引導詞）之後沒剩東西，就算純職司。
   DUTY_NOTES:['烹飪','維安','清潔'],
   DUTY_LEAD:['報名','安排','負責','擔任','排','做'],
-  // 第二階段（職司初安排）開始前，職司備註整個先不顯示，這天起自動出現。
-  // 想提前公開就把日期改早，想一直顯示就設成 null。
-  DUTY_SHOW_FROM:'2026-09-14',
   PHASES:[
     { until:'2026-09-13', n:'①', wh:'即日起～9/13', lb:'向區中心報名了愿日期' },
     { until:'2026-09-18', n:'②', wh:'9/14～9/18',  lb:'職司初安排' },
@@ -449,7 +498,7 @@ function dataTableToRows(dt){
 async function refresh(force){
   clearTimeout(timer);
   try{
-    const dataRows=await runQuery(CONFIG.DATA_GID,'A1:I100');
+    const dataRows=await runQuery(CONFIG.DATA_GID,'A1:L100');
     const data=buildData(dataRows);
     const hash=JSON.stringify(data);
     if(force || hash!==currentHash){
@@ -491,61 +540,137 @@ function showError(err){
 }
 
 /* ---------- 整理資料 ---------- */
+/* 姓名前面的記號 → 小圖示。◆組長 / #聯絡窗口 / ✱獻供人員 */
+const MARKS=[
+  {re:/^[◆◇]+\s*/,       key:'lead', ico:'長', lb:'烹飪組長'},
+  {re:/^[#＃]+\s*/,       key:'link', ico:'聯', lb:'聯絡窗口'},
+  {re:/^[✱✳✽＊*※]+\s*/,  key:'offer',ico:'供', lb:'獻供人員'}
+];
+/* 把名字前面的記號剝下來，回傳 {name, marks:[{key,ico,lb}]} */
+function splitMarks(raw){
+  let t=String(raw||'').trim();
+  const marks=[];
+  let hit=true;
+  while(hit){
+    hit=false;
+    MARKS.forEach(m=>{
+      if(m.re.test(t)){
+        t=t.replace(m.re,'');
+        if(!marks.some(x=>x.key===m.key))marks.push(m);
+        hit=true;
+      }
+    });
+  }
+  return {name:t.trim(),marks};
+}
+/* 職司 → 配色代號。認不得的就給中性色，不會壞掉 */
+function dutyKey(name){
+  const n=String(name||'');
+  if(/烹飪|廚|香積/.test(n))return 'cook';
+  if(/清潔|打掃/.test(n))return 'clean';
+  if(/維安|安全|護持/.test(n))return 'guard';
+  if(/未分配|未定|待分/.test(n))return 'todo';
+  return n?'other':'none';
+}
+
+/* ---------- 整理資料 ---------- */
+/* 試算表可能是「有職司欄」或「沒有職司欄」兩種版面，靠日期列自動判斷：
+   日期列第一個看起來像日期的欄位＝第一天，它左邊一欄是人數／編號，
+   再左邊一欄（如果有）就是職司。這樣加欄位的過程中網頁也不會壞。 */
+function findDayStart(rows){
+  for(let r=1;r<Math.min(5,rows.length);r++){
+    for(let c=0;c<6;c++){
+      if(/\d{1,2}\s*\/\s*\d{1,2}/.test(cell(rows,r,c)))return c;
+    }
+  }
+  return 1;
+}
 function buildData(rows){
   if(!rows || rows.length<4) throw new Error('Google 試算表沒有回傳完整勤務資料');
-  const groupRow=padSlice(rows[1]||[],1,9);
-  const dateRow=padSlice(rows[2]||[],1,9);
-  const timeRow=padSlice(rows[3]||[],1,9);
-  // 找出「備註」列。注意：GViz 會把 A 欄視為數字欄，
-  // 「日期」「時間」「備註」這類文字會被讀成空字串，所以不能只靠文字比對。
-  // 先試文字，讀不到就用「A 欄最後一個有編號的列」往下推。
-  let noteIndex=rows.findIndex(r=>String(r[0]||'').trim()==='備註');
+  const dayStart=findDayStart(rows);
+  const numCol=Math.max(0,dayStart-1);            // 人數／編號欄
+  const dutyCol=dayStart>=2?dayStart-2:-1;        // 職司欄（沒有就是 -1）
+  const hasDuty=dutyCol>=0;
+  const DAYS=8;
+  const groupRow=padSlice(rows[1]||[],dayStart,dayStart+DAYS);
+  const dateRow =padSlice(rows[2]||[],dayStart,dayStart+DAYS);
+  const timeRow =padSlice(rows[3]||[],dayStart,dayStart+DAYS);
+
+  // 找「備註」列：左邊幾個標籤欄都找找看；
+  // 找不到就用「最後一個有編號的列」往下推（GViz 會把數字欄裡的文字讀成空字串）。
+  let noteIndex=-1;
+  for(let r=4;r<rows.length && noteIndex<0;r++){
+    for(let c=0;c<=numCol;c++){ if(cell(rows,r,c).trim()==='備註'){noteIndex=r;break;} }
+  }
   if(noteIndex<0){
-    let lastLabel=-1;
-    for(let r=4;r<rows.length;r++){ if(cell(rows,r,0).trim())lastLabel=r; }
-    noteIndex=lastLabel>=0?lastLabel+1:rows.length;
+    let last=-1;
+    for(let r=4;r<rows.length;r++){ if(cell(rows,r,numCol).trim())last=r; }
+    noteIndex=last>=0?last+1:rows.length;
   }
-  const labels=[];
-  for(let r=4;r<noteIndex;r++){
-    const x=cell(rows,r,0).trim();
-    if(x)labels.push(x);
-  }
-  const groups=[];
-  let currentGroup='';
-  for(let i=0;i<8;i++){
-    const g=String(groupRow[i]||'').replace(/\s+/g,' ').trim();
-    if(g)currentGroup=g;
-    groups.push(currentGroup);
-  }
+
   const days=[];
-  for(let c=0;c<8;c++){
-    const dateText=String(dateRow[c]||'').trim();
+  const groups=[];
+  let cg='';
+  for(let i=0;i<DAYS;i++){
+    const g=String(groupRow[i]||'').replace(/\s+/g,' ').trim();
+    if(g)cg=g;
+    groups.push(cg);
+  }
+  const dayCols=[];
+  for(let i=0;i<DAYS;i++){
+    const dateText=String(dateRow[i]||'').trim();
     if(!dateText)continue;
-    const people=[];
-    for(let r=4;r<noteIndex;r++){
-      const name=cell(rows,r,c+1).trim();
-      if(name)people.push({no:cell(rows,r,0).trim(),name});
-    }
-    const notes=[];
-    for(let r=noteIndex;r<rows.length;r++){
-      const n=cell(rows,r,c+1).trim();
-      if(n)notes.push(n);
-    }
+    dayCols.push(i);
     days.push({
       dateText,
       isoDate:toIso(dateText),
-      group:groups[c]||'',
-      time:String(timeRow[c]||'').trim(),
-      people,
-      notes,
-      filled:people.length
+      group:groups[i]||'',
+      time:String(timeRow[i]||'').trim(),
+      people:[],
+      notes:[],
+      filled:0
     });
   }
-  return {
-    rowLabels:labels,
-    days,
-    today:todayIso()
-  };
+
+  // 名單：一列一列讀，職司空白＝延續上面那格（合併儲存格就是這樣）
+  const grid=[];
+  let curDuty='';
+  for(let r=4;r<noteIndex;r++){
+    if(hasDuty){
+      const d=cell(rows,r,dutyCol).trim();
+      if(d)curDuty=d;
+    }
+    const no=cell(rows,r,numCol).trim();
+    const cells=dayCols.map(i=>splitMarks(cell(rows,r,dayStart+i)));
+    if(!no && cells.every(x=>!x.name))continue;      // 整列空白就跳過
+    grid.push({duty:curDuty,no,cells});
+    cells.forEach((x,k)=>{
+      if(!x.name)return;
+      days[k].people.push({no,name:x.name,duty:curDuty,marks:x.marks});
+    });
+  }
+  days.forEach(d=>{d.filled=d.people.length});
+
+  // 備註列（含它下面的列）
+  for(let r=noteIndex;r<rows.length;r++){
+    dayCols.forEach((i,k)=>{
+      const n=cell(rows,r,dayStart+i).trim();
+      if(n)days[k].notes.push(n);
+    });
+    // 備註常常整段寫在第一天那一格，也可能寫在標籤欄右邊第一格
+    const first=cell(rows,r,dayStart).trim();
+    if(first && days[0] && days[0].notes.indexOf(first)<0){/* 已在上面收過 */}
+  }
+
+  // 職司分塊（連續同職司的列算一塊）
+  const blocks=[];
+  grid.forEach(row=>{
+    const last=blocks[blocks.length-1];
+    if(last && last.duty===row.duty)last.rows.push(row);
+    else blocks.push({duty:row.duty,rows:[row]});
+  });
+
+  return {days,grid,blocks,hasDuty,today:todayIso()};
 }
 
 /* ---------- 畫面 ---------- */
@@ -553,6 +678,7 @@ function render(data){
   noteIdx=buildNoteIndex(data);
   $('content').className='';
   $('content').innerHTML=buildTable(data);
+  buildLegend(data);
   buildNotes(data);
   updateScrollHint();
 }
@@ -643,7 +769,6 @@ function buildNoteIndex(data){
   const byDate=new Map();       // 日期 → [{names,text}]
   const undated=[];             // 沒寫日期的整則，只放進下方清單
   const seen=new Set();
-  const hideDuty=dutyHidden();
   (data.days||[]).forEach(d=>(d.notes||[]).forEach(cellText=>{
     String(cellText).split(/\r?\n/).forEach(line=>{
       const v=noteTrim(line);
@@ -654,15 +779,14 @@ function buildNoteIndex(data){
       const content=mm ? mm[2] : v;
       const parts=DATE_ONE.test(content) ? splitByDate(content) : [];
       if(!parts.length){
-        if((CONFIG.SKIP_NOTES||[]).indexOf(noteTrim(content))<0 && !(hideDuty && isDutyOnly(content)))
+        if((CONFIG.SKIP_NOTES||[]).indexOf(noteTrim(content))<0 && !isDutyOnly(content))
           undated.push({names,text:content,raw:v});
         return;
       }
       parts.forEach(part=>part.dates.forEach(iso=>{
-        if(hideDuty && isDutyOnly(part.text))return;   // 第二階段前，職司整個不顯示
+        if(isDutyOnly(part.text))return;    // 職司改用表格分塊呈現，備註不再列
         if(!byDate.has(iso))byDate.set(iso,[]);
         byDate.get(iso).push({names,text:part.text});
-        if(isDutyOnly(part.text))return;      // 純職司只留在下方清單（表格不加「註」）
         names.forEach(n=>{
           const k=n+'@'+iso;
           if(!byNameDate.has(k))byNameDate.set(k,[]);
@@ -681,11 +805,6 @@ function isDutyOnly(text){
   (CONFIG.DUTY_NOTES||[]).forEach(w=>{t=t.split(w).join('')});
   (CONFIG.DUTY_LEAD||[]).forEach(w=>{t=t.split(w).join('')});
   return !t.replace(/[\s、,，。;；:：\/和與及跟]/g,'');
-}
-/* 第二階段還沒到之前，職司備註連下方清單都先藏起來 */
-function dutyHidden(){
-  const from=CONFIG.DUTY_SHOW_FROM;
-  return !!from && todayIso()<from;
 }
 function notesFor(name,iso){ return noteIdx.byNameDate.get(name+'@'+iso)||null; }
 
@@ -743,52 +862,77 @@ function buildNotes(data){
 }
 function buildTable(data){
   if(!data.days.length)return '<div class="status">目前沒有勤務資料。</div>';
-  const labels=data.rowLabels.length?data.rowLabels:Array.from({length:17},(_,i)=>String(i+1));
+  const nDay=data.days.length;
+  const labelCols=data.hasDuty?2:1;      // 左邊固定幾欄（職司＋人數 / 只有編號）
   const gs=groupSpans(data.days);
+  const head=(cls,label,cellsHtml)=>
+    `<tr class="${cls}"><th class="corner" colspan="${labelCols}">${label}</th>${cellsHtml}</tr>`;
+
   const groupHtml=gs.map(g=>
-    `<th class="day-col ${g.start?'group-start':''}" colspan="${g.span}">${esc(g.name)}</th>`
-  ).join('');
+    `<th class="day-col ${g.start?'group-start':''}" colspan="${g.span}">${esc(g.name)}</th>`).join('');
   const dateHtml=data.days.map((d,i)=>
     `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
       ${esc(d.dateText).replace(/\r?\n/g,'<br>')}
       ${d.isoDate===data.today?'<span class="today-mark">今天</span>':''}
-    </th>`
-  ).join('');
+    </th>`).join('');
   const timeHtml=data.days.map((d,i)=>
     `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
       ${d.time?esc(d.time).replace(/\n/g,'<br>'):'—'}
-    </th>`
-  ).join('');
-  const countHtml=data.days.map((d,i)=>{
-    return `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
+    </th>`).join('');
+  const countHtml=data.days.map((d,i)=>
+    `<th class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">
       <span class="cnt${d.filled?'':' cnt-zero'}">${d.filled} 人</span>
-    </th>`;
-  }).join('');
-  const body=labels.map(label=>{
-    const tds=data.days.map((d,i)=>{
-      const p=(d.people||[]).find(x=>String(x.no)===String(label));
-      let cell='<span class="empty">—</span>';
-      if(p){
-        cell = notesFor(p.name,d.isoDate)
-          ? `<button type="button" class="person has-note" data-name="${esc(p.name)}" data-date="${esc(d.isoDate)}" `+
-            `data-when="${esc(String(d.dateText||'').split('\n')[0].trim())}" `+
-            `aria-label="${esc(p.name)}，${esc(String(d.dateText||'').split('\n')[0].trim())}有備註，點開查看">`+
-            `${esc(p.name)}<span class="mk">註</span></button>`
-          : `<span class="person">${esc(p.name)}</span>`;
-      }
-      return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">${cell}</td>`;
-    }).join('');
-    return `<tr><th class="row-label">${esc(label)}</th>${tds}</tr>`;
-  }).join('');
-  return `<table>
+    </th>`).join('');
+
+  let body='';
+  (data.blocks||[]).forEach(blk=>{
+    const k=dutyKey(blk.duty);
+    blk.rows.forEach((row,ri)=>{
+      const tds=data.days.map((d,i)=>{
+        const cell=row.cells[i]||{name:'',marks:[]};
+        let html='<span class="empty">—</span>';
+        if(cell.name){
+          const ico=(cell.marks||[]).map(m=>
+            `<span class="mk mk-${m.key}" aria-label="${esc(m.lb)}" title="${esc(m.lb)}">${esc(m.ico)}</span>`).join('');
+          const when=String(d.dateText||'').split('\n')[0].trim();
+          html = notesFor(cell.name,d.isoDate)
+            ? `<button type="button" class="person has-note" data-name="${esc(cell.name)}" data-date="${esc(d.isoDate)}" `+
+              `data-when="${esc(when)}" aria-label="${esc(cell.name)}，${esc(when)}有備註，點開查看">`+
+              `${ico}<span class="nm">${esc(cell.name)}</span><span class="mk mk-note">註</span></button>`
+            : `<span class="person">${ico}<span class="nm">${esc(cell.name)}</span></span>`;
+        }
+        return `<td class="day-col ${todayClass(d,data)} ${groupStart(data.days,i)}">${html}</td>`;
+      }).join('');
+      const dutyCell=(data.hasDuty && ri===0)
+        ? `<th class="duty-label d-${k}" rowspan="${blk.rows.length}"><span>${esc(blk.duty||'　')}</span></th>`
+        : '';
+      body+=`<tr class="d-${k}${ri%2?' alt':''}${ri===0?' blk-top':''}">${dutyCell}`+
+            `<th class="row-label">${esc(row.no||'')}</th>${tds}</tr>`;
+    });
+  });
+
+  return `<table class="${data.hasDuty?'has-duty':''}">
     <thead>
-      <tr class="group-row"><th class="corner">小組</th>${groupHtml}</tr>
-      <tr class="date-row"><th class="corner">日期</th>${dateHtml}</tr>
-      <tr class="time-row"><th class="corner">時間</th>${timeHtml}</tr>
-      <tr class="count-row"><th class="corner">人數</th>${countHtml}</tr>
+      ${head('group-row','小組',groupHtml)}
+      ${head('date-row','日期',dateHtml)}
+      ${head('time-row','時間',timeHtml)}
+      ${head('count-row','人數',countHtml)}
     </thead>
     <tbody>${body}</tbody>
   </table>`;
+}
+/* 表格上方的記號說明，只列出名單裡真的用到的 */
+function buildLegend(data){
+  const box=$('legend');
+  if(!box)return;
+  const used=[];
+  (data.days||[]).forEach(d=>(d.people||[]).forEach(p=>(p.marks||[]).forEach(m=>{
+    if(!used.some(x=>x.key===m.key))used.push(m);
+  })));
+  if(!used.length){box.hidden=true;box.innerHTML='';return;}
+  box.innerHTML=used.map(m=>
+    `<span class="lg"><span class="mk mk-${m.key}">${esc(m.ico)}</span>${esc(m.lb)}</span>`).join('');
+  box.hidden=false;
 }
 function groupSpans(days){
   const out=[];let start=0;
