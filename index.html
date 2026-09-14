@@ -155,6 +155,57 @@ h1 .t-date,h1 .t-name{display:block}
   scroll-snap-type:x proximity;scroll-padding-left:88px}
 .ds-scroll .date-row .day-col{scroll-snap-align:start}
 
+/* 階段折疊：第一階段預設收起來，先看到第二階段 */
+details.fold.stage{margin:12px 0}
+details.fold.stage>summary .s-note{margin-left:10px;font-size:14.5px;font-weight:800;color:#5c7ea0}
+.fold-body.flush{padding:0}
+.fold-body.flush .shell{border:0;border-radius:0;box-shadow:none}
+.fold-body.flush .notes-box{margin:0;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none}
+
+/* 職司分配（拖拉） */
+.a-sub{font-size:15.5px;line-height:1.7;color:#3f5262;margin-bottom:10px}
+.a-group{border:1px solid var(--line);border-radius:11px;margin-bottom:9px;overflow:hidden}
+.a-head{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:18px;font-weight:900;
+  border-bottom:1px solid var(--line)}
+.a-head .n{margin-left:auto;font-size:14px;color:#5c7183}
+.a-g-cook .a-head{background:#f4dcbd;color:#6b4416}
+.a-g-clean .a-head{background:#cfe0f2;color:#1c4c6d}
+.a-g-guard .a-head{background:#d8e8d6;color:#2b5730}
+.a-g-none .a-head{background:#e9edf1;color:#4b5b68}
+.a-rows{min-height:46px;padding:5px;background:#fff}
+.a-rows.over{background:var(--brand-soft)}
+.a-hint{padding:10px 6px;text-align:center;color:#9fb2c1;font-size:14.5px}
+.a-row{display:flex;align-items:center;gap:8px;padding:8px 9px;margin:3px 0;background:#fff;
+  border:1px solid var(--line);border-radius:9px;touch-action:none;user-select:none;cursor:grab}
+.a-row.drag{position:fixed;z-index:150;box-shadow:0 12px 28px rgba(16,48,74,.3);opacity:.96;
+  pointer-events:none;cursor:grabbing}
+.a-ph{margin:3px 0;border:2px dashed var(--brand);border-radius:9px;background:var(--brand-soft)}
+.a-grip{flex:0 0 auto;color:#9fb2c1;font-size:17px;line-height:1;letter-spacing:-2px}
+.a-nm{font-size:18px;font-weight:900;white-space:nowrap}
+.a-qk{display:flex;gap:3px;flex:0 0 auto;margin-left:auto}
+.a-qk button{appearance:none;border:1px solid var(--line);background:#fff;color:#5a6c7a;font:inherit;
+  font-size:13px;font-weight:900;padding:4px 7px;border-radius:7px;cursor:pointer}
+.a-qk button:hover{background:var(--brand-soft);color:var(--brand-dark)}
+.a-qk button.on{background:var(--brand-dark);color:#fff;border-color:var(--brand-dark)}
+.a-days{display:flex;flex-wrap:wrap;gap:3px;width:100%;order:9}
+.a-d{font-size:12px;font-weight:900;color:#43606f;background:#eef4f9;border:1px solid #d8e6f0;
+  border-radius:6px;padding:1px 5px;white-space:nowrap}
+.a-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.a-btn{appearance:none;border:1px solid var(--brand-dark);background:#fff;color:var(--brand-dark);
+  font:inherit;font-weight:900;font-size:15.5px;padding:8px 15px;border-radius:9px;cursor:pointer}
+.a-btn.main{background:var(--brand-dark);color:#fff}
+.a-msg{font-size:14.5px;font-weight:900;color:var(--muted);line-height:1.5}
+.a-msg.ok{color:#1d6b45}
+.a-msg.err{color:#8f3f34}
+.a-out{width:100%;height:110px;margin-top:8px;padding:8px;border:1px solid var(--line);
+  border-radius:9px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.5}
+
+/* 第二階段裡面的子折疊：比外層低一階 */
+details.fold.sub{margin-top:12px;box-shadow:none;border-color:#d7e4ef}
+details.fold.sub>summary{font-size:17px;padding:10px 13px;
+  background:linear-gradient(180deg,#f4f9fd 0%,#e6f0f9 100%)}
+details.fold.stage>.fold-body>.duty-sum{margin-top:0}
+
 /* 折疊區：職司說明 */
 .folds{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;margin:12px 0 4px}
 details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
@@ -356,28 +407,60 @@ tr.d-none.alt .row-label{background:#d5e4f1}
   <div class="warnbar" id="warnbar" hidden></div>
 
   <div class="legend" id="legend" hidden></div>
-  <div class="shell">
-    <div class="scroll" id="tableScroll">
-      <div id="content" class="status">正在讀取勤務表…</div>
-    </div>
-  </div>
-  <div class="notes-box" id="notesBox" hidden></div>
-  <div class="duty-sum" id="dutySum" hidden></div>
-  <div class="folds">
-    <details class="fold">
-      <summary>第二階段：職司規劃說明</summary>
-      <div class="fold-body">
-        <div class="rows">
-          <div class="r"><span class="d">🍳 烹飪</span>
-            <span>主要烹飪要<b>前一天晚上</b>先到，與頭手交接，並確認<b>隔天早上人力是否足夠</b>。<em>職司完整不空窗：前一天晚上 → 當天</em></span></div>
-          <div class="r"><span class="d">🛡️ 維安</span>
-            <span>要<b>睡一晚</b>，隔天執完早香、完成交接後才離開。<em>職司完整不空窗：當天 → 隔天早香後</em></span></div>
-          <div class="r"><span class="d">🧹 清潔</span>
-            <span>沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
+
+  <details class="fold stage" id="stage1">
+    <summary>第一階段：報名名單<span class="s-note">誰哪幾天來</span></summary>
+    <div class="fold-body flush">
+      <div class="shell">
+        <div class="scroll" id="tableScroll">
+          <div id="content" class="status">正在讀取勤務表…</div>
         </div>
       </div>
-    </details>
-  </div>
+      <div class="notes-box" id="notesBox" hidden></div>
+    </div>
+  </details>
+
+  <details class="fold stage" id="stage2" open>
+    <summary>第二階段：職司安排<span class="s-note">誰做什麼</span></summary>
+    <div class="fold-body">
+
+      <div class="duty-sum" id="dutySum" hidden></div>
+
+      <details class="fold sub" id="assignFold" hidden>
+        <summary>職司分配<span class="s-note">排班用</span></summary>
+        <div class="fold-body">
+          <div class="a-sub">上下拖名字換組，或按右邊的 <b>烹</b>／<b>清</b>／<b>維</b> 直接指定，
+            一次就把那個人<b>所有排到的日期</b>都改好。改完按「複製表格」，
+            回 Google 試算表的<b>職司分頁</b>貼上。
+            <br><b>在這裡拖不會改到大家看到的班表</b>——要貼回試算表才算數，
+            拖錯了按「重來」或重新整理就回到原狀。</div>
+          <div id="aGroups"></div>
+          <div class="a-bar">
+            <button class="a-btn main" id="aCopy" type="button">複製表格</button>
+            <button class="a-btn" id="aReset" type="button">重來</button>
+            <span class="a-msg" id="aMsg"></span>
+          </div>
+          <textarea class="a-out" id="aOut" readonly placeholder="按「複製表格」後，要貼回試算表的內容會出現在這裡"></textarea>
+        </div>
+      </details>
+
+      <details class="fold sub">
+        <summary>職司規劃說明</summary>
+        <div class="fold-body">
+          <div class="rows">
+            <div class="r"><span class="d">🍳 烹飪</span>
+              <span>主要烹飪要<b>前一天晚上</b>先到，與頭手交接，並確認<b>隔天早上人力是否足夠</b>。<em>職司完整不空窗：前一天晚上 → 當天</em></span></div>
+            <div class="r"><span class="d">🛡️ 維安</span>
+              <span>要<b>睡一晚</b>，隔天執完早香、完成交接後才離開。<em>職司完整不空窗：當天 → 隔天早香後</em></span></div>
+            <div class="r"><span class="d">🧹 清潔</span>
+              <span>沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
+          </div>
+        </div>
+      </details>
+
+    </div>
+  </details>
+
   <div class="footer">每 30 秒自動同步 Google 試算表；內容有變更才更新。｜已採大字、高對比版面。</div>
 </main>
 
@@ -390,7 +473,8 @@ tr.d-none.alt .row-label{background:#d5e4f1}
 <script>
 const CONFIG = {
   SPREADSHEET_ID:'1GEE-2ISgzqAca-SblK2SSu8e7a_rlwyrkjH73wiHiW4',
-  DATA_GID:'303688467',
+  DATA_GID:'303688467',          // 名單分頁（誰哪幾天來、備註）
+  DUTY_GID:'2044846380',         // 職司分頁（職司分塊）；設成 '' 就不顯示職司表
   CHECK_MS:30000,
   // 報名階段。until 是這個階段的最後一天（含）；最後一個階段的 until 設 null。
   // 系統會依台北時間自動切換，不用手動改。
@@ -410,6 +494,7 @@ const CONFIG = {
 };
 
 let currentData=null;
+let currentDuty=null;   // 職司分頁的資料（讀不到就是 null）
 let noteIdx={byNameDate:new Map(),byDate:new Map(),undated:[]};  // 備註索引：姓名@日期 / 日期 / 沒寫日期的
 let currentHash='';
 let timer=null;
@@ -511,16 +596,23 @@ function dataTableToRows(dt){
 async function refresh(force){
   clearTimeout(timer);
   try{
-    const dataRows=await runQuery(CONFIG.DATA_GID,'A1:L100');
+    // 名單分頁一定要讀到；職司分頁讀不到就只是不顯示職司表，不影響主表
+    const jobs=[runQuery(CONFIG.DATA_GID,'A1:L100')];
+    jobs.push(CONFIG.DUTY_GID
+      ? runQuery(CONFIG.DUTY_GID,'A1:L100').catch(()=>null)
+      : Promise.resolve(null));
+    const [dataRows,dutyRows]=await Promise.all(jobs);
     const data=buildData(dataRows);
-    const hash=JSON.stringify(data);
+    let duty=null;
+    if(dutyRows){ try{ duty=buildData(dutyRows); }catch(e){ duty=null; } }
+    const hash=JSON.stringify([data,duty]);
     if(force || hash!==currentHash){
       currentHash=hash;
-      currentData=data;
-      render(data);
+      currentData=data; currentDuty=duty;
+      render(data,duty);
       setStatus('最近更新：'+nowText());
     }else{
-      currentData=data;
+      currentData=data; currentDuty=duty;
       setStatus('最近檢查：'+nowText()+'（無變更）');
     }
     setWarn('');
@@ -552,12 +644,11 @@ function showError(err){
     '<div style="margin-top:6px;font-size:15px">'+esc(message)+'</div>';
 }
 
-/* ---------- 整理資料 ---------- */
 /* 姓名前面的記號 → 小圖示。◆組長 / #聯絡窗口 / ✱獻供人員 */
 const MARKS=[
   {re:/^[◆◇]+\s*/,       key:'lead', ico:'長', lb:'烹飪組長'},
   {re:/^[#＃]+\s*/,       key:'link', ico:'聯', lb:'聯絡窗口'},
-  {re:/^[✱✳✽＊*※]+\s*/,  key:'offer',ico:'供', lb:'獻供人員'}
+  {re:/^[✱✳✽❋❉✻✼＊*※]+\s*/, key:'offer',ico:'供', lb:'獻供人員'}
 ];
 /* 把名字前面的記號剝下來，回傳 {name, marks:[{key,ico,lb}]} */
 function splitMarks(raw){
@@ -574,7 +665,7 @@ function splitMarks(raw){
       }
     });
   }
-  return {name:t.trim(),marks};
+  return {name:t.trim(),marks,raw:String(raw||'').trim()};
 }
 /* 職司 → 配色代號。認不得的就給中性色，不會壞掉 */
 function dutyKey(name){
@@ -587,42 +678,61 @@ function dutyKey(name){
 }
 
 /* ---------- 整理資料 ---------- */
-/* 試算表可能是「有職司欄」或「沒有職司欄」兩種版面，靠日期列自動判斷：
-   日期列第一個看起來像日期的欄位＝第一天，它左邊一欄是人數／編號，
-   再左邊一欄（如果有）就是職司。這樣加欄位的過程中網頁也不會壞。 */
-function findDayStart(rows){
-  for(let r=1;r<Math.min(5,rows.length);r++){
-    for(let c=0;c<6;c++){
-      if(/\d{1,2}\s*\/\s*\d{1,2}/.test(cell(rows,r,c)))return c;
-    }
+/* 兩個分頁的版面不完全一樣（名單分頁有「小組」列，職司分頁有「星期」列），
+   所以不寫死第幾列，靠內容判斷：
+     - 日期列 = 第一個出現日期的列，日期的第一欄就是第一天
+     - 編號欄 = 日期左邊一欄；再左邊（如果有）是職司欄
+     - 名單 = 日期列之後，第一個「編號欄有東西」的列開始
+     - 時間列 = 日期列和名單之間、不是「星期X」的那一列
+     - 小組列 = 日期列上面那一列（日期欄裡有字才算）
+   這樣試算表加減一列標題都不會壞。 */
+function findLayout(rows){
+  const isDate=t=>/\d{1,2}\s*\/\s*\d{1,2}/.test(t);
+  let dateRow=-1,dayStart=1;
+  for(let r=1;r<Math.min(7,rows.length)&&dateRow<0;r++)
+    for(let c=0;c<6;c++)
+      if(isDate(cell(rows,r,c))&&isDate(cell(rows,r,c+1))){dateRow=r;dayStart=c;break;}
+  if(dateRow<0)
+    for(let r=1;r<Math.min(7,rows.length)&&dateRow<0;r++)
+      for(let c=0;c<6;c++) if(isDate(cell(rows,r,c))){dateRow=r;dayStart=c;break;}
+  if(dateRow<0){dateRow=2;dayStart=1;}
+  const numCol=Math.max(0,dayStart-1);
+  let bodyStart=-1;
+  for(let r=dateRow+1;r<rows.length;r++) if(cell(rows,r,numCol).trim()){bodyStart=r;break;}
+  if(bodyStart<0)bodyStart=dateRow+2;
+  let timeRow=-1;
+  for(let r=dateRow+1;r<bodyStart;r++){
+    const vals=[];
+    for(let i=0;i<8;i++){const v=cell(rows,r,dayStart+i).trim();if(v)vals.push(v)}
+    if(!vals.length||vals.every(v=>/^星期./.test(v)))continue;
+    timeRow=r;break;
   }
-  return 1;
+  let groupRow=-1;
+  if(dateRow-1>=1)
+    for(let i=0;i<8;i++) if(cell(rows,dateRow-1,dayStart+i).trim()){groupRow=dateRow-1;break;}
+  return {dateRow,dayStart,numCol,dutyCol:dayStart>=2?dayStart-2:-1,bodyStart,timeRow,groupRow};
 }
 function buildData(rows){
   if(!rows || rows.length<4) throw new Error('Google 試算表沒有回傳完整勤務資料');
-  const dayStart=findDayStart(rows);
-  const numCol=Math.max(0,dayStart-1);            // 人數／編號欄
-  const dutyCol=dayStart>=2?dayStart-2:-1;        // 職司欄（沒有就是 -1）
+  const L=findLayout(rows);
+  const {dayStart,numCol,dutyCol,bodyStart}=L;
   const hasDuty=dutyCol>=0;
   const DAYS=8;
-  const groupRow=padSlice(rows[1]||[],dayStart,dayStart+DAYS);
-  const dateRow =padSlice(rows[2]||[],dayStart,dayStart+DAYS);
-  const timeRow =padSlice(rows[3]||[],dayStart,dayStart+DAYS);
+  const pick=r=>r>=0?padSlice(rows[r]||[],dayStart,dayStart+DAYS):[];
+  const groupRow=pick(L.groupRow), dateRow=pick(L.dateRow), timeRow=pick(L.timeRow);
 
   // 找「備註」列：左邊幾個標籤欄都找找看；
   // 找不到就用「最後一個有編號的列」往下推（GViz 會把數字欄裡的文字讀成空字串）。
   let noteIndex=-1;
-  for(let r=4;r<rows.length && noteIndex<0;r++){
+  for(let r=bodyStart;r<rows.length && noteIndex<0;r++)
     for(let c=0;c<=numCol;c++){ if(cell(rows,r,c).trim()==='備註'){noteIndex=r;break;} }
-  }
   if(noteIndex<0){
     let last=-1;
-    for(let r=4;r<rows.length;r++){ if(cell(rows,r,numCol).trim())last=r; }
+    for(let r=bodyStart;r<rows.length;r++){ if(cell(rows,r,numCol).trim())last=r; }
     noteIndex=last>=0?last+1:rows.length;
   }
 
-  const days=[];
-  const groups=[];
+  const days=[],groups=[];
   let cg='';
   for(let i=0;i<DAYS;i++){
     const g=String(groupRow[i]||'').replace(/\s+/g,' ').trim();
@@ -634,28 +744,17 @@ function buildData(rows){
     const dateText=String(dateRow[i]||'').trim();
     if(!dateText)continue;
     dayCols.push(i);
-    days.push({
-      dateText,
-      isoDate:toIso(dateText),
-      group:groups[i]||'',
-      time:String(timeRow[i]||'').trim(),
-      people:[],
-      notes:[],
-      filled:0
-    });
+    days.push({dateText,isoDate:toIso(dateText),group:groups[i]||'',
+      time:String(timeRow[i]||'').trim(),people:[],notes:[],filled:0});
   }
 
-  // 名單：一列一列讀，職司空白＝延續上面那格（合併儲存格就是這樣）
   const grid=[];
   let curDuty='';
-  for(let r=4;r<noteIndex;r++){
-    if(hasDuty){
-      const d=cell(rows,r,dutyCol).trim();
-      if(d)curDuty=d;
-    }
+  for(let r=bodyStart;r<noteIndex;r++){
+    if(hasDuty){ const d=cell(rows,r,dutyCol).trim(); if(d)curDuty=d; }
     const no=cell(rows,r,numCol).trim();
     const cells=dayCols.map(i=>splitMarks(cell(rows,r,dayStart+i)));
-    if(!no && cells.every(x=>!x.name))continue;      // 整列空白就跳過
+    if(!no && cells.every(x=>!x.name))continue;
     grid.push({duty:curDuty,no,cells});
     cells.forEach((x,k)=>{
       if(!x.name)return;
@@ -664,35 +763,29 @@ function buildData(rows){
   }
   days.forEach(d=>{d.filled=d.people.length});
 
-  // 備註列（含它下面的列）
-  for(let r=noteIndex;r<rows.length;r++){
+  for(let r=noteIndex;r<rows.length;r++)
     dayCols.forEach((i,k)=>{
       const n=cell(rows,r,dayStart+i).trim();
       if(n)days[k].notes.push(n);
     });
-    // 備註常常整段寫在第一天那一格，也可能寫在標籤欄右邊第一格
-    const first=cell(rows,r,dayStart).trim();
-    if(first && days[0] && days[0].notes.indexOf(first)<0){/* 已在上面收過 */}
-  }
 
-  // 職司分塊（連續同職司的列算一塊）
   const blocks=[];
   grid.forEach(row=>{
     const last=blocks[blocks.length-1];
     if(last && last.duty===row.duty)last.rows.push(row);
     else blocks.push({duty:row.duty,rows:[row]});
   });
-
-  return {days,grid,blocks,hasDuty,today:todayIso()};
+  return {days,grid,blocks,hasDuty,pasteAt:bodyStart+1,today:todayIso()};
 }
 
 /* ---------- 畫面 ---------- */
-function render(data){
-  noteIdx=buildNoteIndex(data);
+function render(data,duty){
+  noteIdx=buildNoteIndex(data);          // 備註只寫在名單分頁
   $('content').className='';
   $('content').innerHTML=buildTable(data);
-  buildLegend(data);
-  buildDutyTable(data);
+  buildLegend(data,duty);
+  buildDutyTable(duty);
+  buildAssign(duty);
   buildNotes(data);
   updateScrollHint();
 }
@@ -930,8 +1023,8 @@ function personHtml(cell,d){
 function buildDutyTable(data){
   const box=$('dutySum');
   if(!box)return;
-  const blocks=(data.blocks||[]).filter(b=>b.duty);
-  if(!data.hasDuty || !blocks.length){ box.hidden=true; box.innerHTML=''; return; }
+  const blocks=(data&&data.blocks||[]).filter(b=>b.duty);
+  if(!data || !data.hasDuty || !blocks.length){ box.hidden=true; box.innerHTML=''; return; }
   const dateHtml=data.days.map(d=>
     `<th class="day-col ${todayClass(d,data)}">${esc(d.dateText).replace(/\r?\n/g,'<br>')}`+
     `${d.isoDate===data.today?'<span class="today-mark">今天</span>':''}</th>`).join('');
@@ -952,7 +1045,7 @@ function buildDutyTable(data){
         `<th class="row-label">${esc(row.no||String(ri+1))}</th>${tds}</tr>`;
     });
   });
-  box.innerHTML='<div class="ds-head">第二階段：職司表</div>'+
+  box.innerHTML='<div class="ds-head">職司表</div>'+
     '<div class="ds-scroll"><table class="has-duty">'+
     '<thead><tr class="date-row"><th class="corner" colspan="2">日期</th>'+dateHtml+'</tr>'+
     '<tr class="count-row"><th class="corner" colspan="2">人數</th>'+cntHtml+'</tr></thead>'+
@@ -961,13 +1054,12 @@ function buildDutyTable(data){
 }
 
 /* 表格上方的記號說明，只列出名單裡真的用到的 */
-function buildLegend(data){
+function buildLegend(data,duty){
   const box=$('legend');
   if(!box)return;
   const used=[];
-  (data.days||[]).forEach(d=>(d.people||[]).forEach(p=>(p.marks||[]).forEach(m=>{
-    if(!used.some(x=>x.key===m.key))used.push(m);
-  })));
+  [data,duty].forEach(src=>(src&&src.days||[]).forEach(d=>(d.people||[]).forEach(p=>
+    (p.marks||[]).forEach(m=>{ if(!used.some(x=>x.key===m.key))used.push(m) }))));
   if(!used.length){box.hidden=true;box.innerHTML='';return;}
   box.innerHTML=used.map(m=>
     `<span class="lg"><span class="mk mk-${m.key}">${esc(m.ico)}</span>${esc(m.lb)}</span>`).join('');
@@ -1083,6 +1175,162 @@ function closePop(){
   delete pop.dataset.key;
 }
 
+/* ---------- 職司分配（拖拉）----------
+   資料就用已經讀進來的職司分頁，不另外再查一次。
+   網頁是唯讀的，所以改完是「複製 → 貼回試算表」。 */
+const A_DUTIES=[
+  {name:'烹飪',key:'cook'},{name:'清潔',key:'clean'},
+  {name:'維安',key:'guard'},{name:'',key:'none',label:'未分配'}
+];
+let aPeople=[], aDays=[], aPasteAt=5, aDirty=false;
+
+function buildAssign(duty){
+  const fold=$('assignFold');
+  if(!fold)return;
+  if(!duty || !duty.hasDuty){ fold.hidden=true; return; }
+  fold.hidden=false;
+  if(aDirty)return;              // 排到一半就不要被自動更新洗掉
+  aDays=duty.days.map(d=>String(d.dateText||'').split(/\r?\n/)[0].trim());
+  aPasteAt=duty.pasteAt||5;
+  const map=new Map();
+  (duty.grid||[]).forEach(row=>{
+    row.cells.forEach((c,k)=>{
+      if(!c.name)return;
+      // 記號要**逐日**留著：同一個人可能只有某一天是獻供人員
+      if(!map.has(c.name))map.set(c.name,{name:c.name,marks:c.marks,raws:{},days:[],duty:row.duty||''});
+      const p=map.get(c.name);
+      if(p.days.indexOf(k)<0)p.days.push(k);
+      p.raws[k]=c.raw||c.name;
+      if(!p.duty)p.duty=row.duty||'';
+      if((c.marks||[]).length>(p.marks||[]).length)p.marks=c.marks;
+    });
+  });
+  aPeople=[...map.values()];
+  aPeople.forEach(p=>{ if(!A_DUTIES.some(d=>d.name===p.duty))p.duty=''; });
+  renderAssign();
+}
+function renderAssign(){
+  const box=$('aGroups');
+  if(!box)return;
+  box.innerHTML=A_DUTIES.map(d=>{
+    const list=aPeople.filter(p=>p.duty===d.name);
+    return `<section class="a-group a-g-${d.key}">
+      <div class="a-head"><span>${esc(d.label||d.name)}</span><span class="n">${list.length} 人</span></div>
+      <div class="a-rows" data-duty="${esc(d.name)}">${
+        list.map(p=>`<div class="a-row" data-name="${esc(p.name)}">
+          <span class="a-grip">⣿</span>
+          <span class="a-nm">${(p.marks||[]).map(m=>
+            `<span class="mk mk-${m.key}">${esc(m.ico)}</span>`).join('')}${esc(p.name)}</span>
+          <span class="a-qk">${A_DUTIES.filter(x=>x.name).map(x=>
+            `<button type="button" data-to="${esc(x.name)}" class="${p.duty===x.name?'on':''}">${esc(x.name[0])}</button>`).join('')}</span>
+          <span class="a-days">${p.days.map(i=>`<span class="a-d">${esc(aDays[i]||'')}</span>`).join('')}</span>
+        </div>`).join('')||'<div class="a-hint">把名字拖到這裡</div>'}</div>
+    </section>`;
+  }).join('');
+}
+/* 小按鈕直接指定 */
+$('aGroups').addEventListener('click',e=>{
+  const b=e.target.closest('.a-qk button'); if(!b)return;
+  const p=aPeople.find(x=>x.name===b.closest('.a-row').dataset.name); if(!p)return;
+  p.duty=(p.duty===b.dataset.to)?'':b.dataset.to;
+  aDirty=true; renderAssign();
+});
+/* 上下拖 */
+let aDrag=null, aScroll=0, aScrollRaf=0;
+/* 名單長的時候，拖到畫面上下緣會自動捲動，不然手機上根本拖不到下面那一組 */
+function aAutoScroll(){
+  if(!aDrag){aScrollRaf=0;return;}
+  if(aScroll)window.scrollBy(0,aScroll);
+  aScrollRaf=requestAnimationFrame(aAutoScroll);
+}
+$('aGroups').addEventListener('pointerdown',e=>{
+  if(e.target.closest('.a-qk'))return;
+  const row=e.target.closest('.a-row'); if(!row)return;
+  e.preventDefault();
+  const r=row.getBoundingClientRect();
+  const ph=document.createElement('div');
+  ph.className='a-ph'; ph.style.height=r.height+'px';
+  row.parentNode.insertBefore(ph,row);
+  row.classList.add('drag');
+  row.style.width=r.width+'px'; row.style.left=r.left+'px'; row.style.top=r.top+'px';
+  aDrag={row,ph,dx:e.clientX-r.left,dy:e.clientY-r.top};
+  row.setPointerCapture(e.pointerId);
+  if(!aScrollRaf)aScrollRaf=requestAnimationFrame(aAutoScroll);
+});
+$('aGroups').addEventListener('pointermove',e=>{
+  if(!aDrag)return;
+  aDrag.row.style.left=(e.clientX-aDrag.dx)+'px';
+  aDrag.row.style.top=(e.clientY-aDrag.dy)+'px';
+  const EDGE=110;
+  aScroll = e.clientY<EDGE ? -Math.ceil((EDGE-e.clientY)/6)
+          : e.clientY>innerHeight-EDGE ? Math.ceil((e.clientY-(innerHeight-EDGE))/6) : 0;
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  if(!el)return;
+  document.querySelectorAll('.a-rows.over').forEach(x=>x.classList.remove('over'));
+  const g=el.closest('.a-group');
+  const box=el.closest('.a-rows')||(g?g.querySelector('.a-rows'):null);
+  if(!box)return;
+  box.classList.add('over');
+  const hint=box.querySelector('.a-hint'); if(hint)hint.remove();
+  let before=null;
+  for(const r of [...box.querySelectorAll('.a-row:not(.drag)')]){
+    const b=r.getBoundingClientRect();
+    if(e.clientY<b.top+b.height/2){before=r;break;}
+  }
+  box.insertBefore(aDrag.ph,before);
+});
+function aEnd(){
+  if(!aDrag)return;
+  const {row,ph}=aDrag;
+  row.classList.remove('drag'); row.style.cssText='';
+  ph.parentNode.insertBefore(row,ph); ph.remove();
+  document.querySelectorAll('.a-rows.over').forEach(x=>x.classList.remove('over'));
+  aDrag=null; aScroll=0;
+  if(aScrollRaf){cancelAnimationFrame(aScrollRaf);aScrollRaf=0;}
+  const out=[];
+  document.querySelectorAll('.a-rows').forEach(box=>{
+    box.querySelectorAll('.a-row').forEach(r=>{
+      const p=aPeople.find(x=>x.name===r.dataset.name);
+      if(p){p.duty=box.dataset.duty;out.push(p)}
+    });
+  });
+  if(out.length===aPeople.length)aPeople=out;
+  aDirty=true; renderAssign();
+}
+$('aGroups').addEventListener('pointerup',aEnd);
+$('aGroups').addEventListener('pointercancel',aEnd);
+
+$('aReset').addEventListener('click',()=>{
+  aDirty=false; buildAssign(currentDuty);
+  $('aMsg').textContent='已還原成試算表上的內容'; $('aMsg').className='a-msg';
+  $('aOut').value='';
+});
+$('aCopy').addEventListener('click',async()=>{
+  const lines=[];
+  A_DUTIES.forEach(d=>{
+    const label=d.label||d.name;
+    aPeople.filter(p=>p.duty===d.name).forEach((p,i)=>{
+      const cells=aDays.map((_,k)=>p.days.indexOf(k)>=0 ? (p.raws[k]||p.name) : '');
+      lines.push([i===0?label:'',String(i+1)].concat(cells).join('\t'));
+    });
+  });
+  const tsv=lines.join('\n'), m=$('aMsg');
+  $('aOut').value=tsv;
+  if(!lines.length){m.textContent='名單是空的。';m.className='a-msg err';return;}
+  const left=aPeople.filter(p=>!p.duty).length;
+  const tail=left?('　⚠ 還有 '+left+' 人未分配'):'';
+  try{
+    await navigator.clipboard.writeText(tsv);
+    m.textContent='已複製 '+lines.length+' 列 → 貼到職司分頁的 A'+aPasteAt+
+      '（會蓋到第 '+(aPasteAt+lines.length-1)+' 列）'+tail;
+    m.className='a-msg '+(left?'err':'ok');
+  }catch(err){
+    $('aOut').select();
+    m.textContent='瀏覽器擋住自動複製，請在下面框裡全選複製（共 '+lines.length+' 列）'+tail;
+    m.className='a-msg err';
+  }
+});
+
 /* ---------- 事件綁定 ---------- */
 document.addEventListener('click',e=>{     // 兩張表都要能點，所以綁在 document
   const btn=e.target.closest('.person.has-note');
@@ -1099,6 +1347,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape')closePop(); });
 
 $('tableScroll').addEventListener('scroll',updateScrollHint,{passive:true});
 window.addEventListener('resize',updateScrollHint);
+$('stage1').addEventListener('toggle',()=>{ if($('stage1').open)setTimeout(updateScrollHint,30); });
 renderSteps();
 </script>
 </body>
