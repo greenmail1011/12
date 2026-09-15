@@ -96,7 +96,8 @@ h1 .t-date,h1 .t-name{display:block}
   width:19px;height:19px;border-radius:50%;background:var(--brand-dark);color:#fff;
   font-size:11px;font-weight:900;line-height:1}
 /* 名字前面的三種身分記號：長＝烹飪組長、聯＝聯絡窗口、供＝獻供人員 */
-.mk-lead{background:#d9a400;color:#3f2c00}
+.mk-lead{background:#e8b600;color:#4a3400;font-size:12px}
+.mk-lead,.person .mk-lead{box-shadow:0 0 0 1px rgba(120,84,0,.35)}
 .mk-link{background:#2f6f9e;color:#fff}
 .mk-offer{background:#c2557f;color:#fff}
 .person .mk-lead,.person .mk-link,.person .mk-offer{margin-right:3px}
@@ -306,6 +307,10 @@ tr.d-todo .row-label{background:#e4e7ea}
 tr.d-todo.alt .row-label{background:#dadee2}
 /* 區塊之間畫一條粗線分開 */
 tr.blk-top>*{border-top:3px solid #9cb3c6}
+/* 「尚未安排」橫跨八欄，字要黏在左邊才看得到（不然會跑到畫面外） */
+td.day-col.none{text-align:left;padding-left:12px;background:#fafbfc!important}
+td.day-col.none>span{position:sticky;left:12px;display:inline-block;
+  color:#8d9fae;font-size:17px;font-weight:900}
 .group-row th{height:52px;padding:7px 8px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);color:#1c4c6d;font-size:23px;font-weight:900;line-height:1.28;white-space:nowrap;vertical-align:middle}
 .date-row th{height:64px;padding:7px 8px;background:linear-gradient(180deg,#f8fbfe 0%,#e0eef9 100%);font-size:23px;font-weight:900;white-space:nowrap;line-height:1.28;text-align:center;vertical-align:middle}
 .time-row th{height:88px;padding:8px 7px;background:#f9fcfe;color:#2c6b96;font-size:16px;line-height:1.55;font-weight:900;white-space:normal;overflow:visible;vertical-align:middle}
@@ -353,6 +358,7 @@ tr.d-none.alt .row-label{background:#d5e4f1}
   .nd-date{flex-basis:74px;font-size:16px}
   .note-item{font-size:16px}
   .mk{width:15px;height:15px;font-size:9px}
+  .mk-lead{font-size:10px}
   .person .mk-lead,.person .mk-link,.person .mk-offer{margin-right:1px}
   .person.has-note{gap:2px;padding:2px 2px;border-radius:7px}
   .pop{font-size:16px;padding:12px 32px 12px 14px}
@@ -646,7 +652,7 @@ function showError(err){
 
 /* 姓名前面的記號 → 小圖示。◆組長 / #聯絡窗口 / ✱獻供人員 */
 const MARKS=[
-  {re:/^[◆◇]+\s*/,       key:'lead', ico:'長', lb:'烹飪組長'},
+  {re:/^[◆◇]+\s*/,       key:'lead', ico:'★', lb:'烹飪組長'},
   {re:/^[#＃]+\s*/,       key:'link', ico:'聯', lb:'聯絡窗口'},
   {re:/^[✱✳✽❋❉✻✼＊*※]+\s*/, key:'offer',ico:'供', lb:'獻供人員'}
 ];
@@ -1034,14 +1040,23 @@ function buildDutyTable(data){
   let body='';
   blocks.forEach(blk=>{
     const k=dutyKey(blk.duty);
-    blk.rows.forEach((row,ri)=>{
+    // 整列八天都沒人的就不畫（試算表留的空位不用佔版面）
+    const rows=blk.rows.filter(r=>(r.cells||[]).some(c=>c.name));
+    if(!rows.length){          // 整個職司還沒排人
+      body+=`<tr class="d-${k} blk-top">`+
+        `<th class="duty-label d-${k}"><span>${esc(blk.duty)}</span></th>`+
+        `<th class="row-label">—</th>`+
+        `<td class="day-col none" colspan="${data.days.length}"><span>尚未安排</span></td></tr>`;
+      return;
+    }
+    rows.forEach((row,ri)=>{
       const tds=data.days.map((d,i)=>{
         const c=row.cells[i]||{name:'',marks:[]};
         return `<td class="day-col ${todayClass(d,data)}">`+
           (c.name?personHtml(c,d):'<span class="empty">—</span>')+'</td>';
       }).join('');
       body+=`<tr class="d-${k}${ri%2?' alt':''}${ri===0?' blk-top':''}">`+
-        (ri===0?`<th class="duty-label d-${k}" rowspan="${blk.rows.length}"><span>${esc(blk.duty)}</span></th>`:'')+
+        (ri===0?`<th class="duty-label d-${k}" rowspan="${rows.length}"><span>${esc(blk.duty)}</span></th>`:'')+
         `<th class="row-label">${esc(row.no||String(ri+1))}</th>${tds}</tr>`;
     });
   });
