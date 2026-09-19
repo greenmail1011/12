@@ -147,8 +147,9 @@ h1 .t-date,h1 .t-name{display:block}
 .note-item b{color:var(--ink);font-weight:900}
 
 /* 第二階段：職司表 */
-.duty-sum{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:13px;
-  box-shadow:var(--shadow);overflow:hidden}
+.duty-sum,.rule-box{margin-top:12px;background:#fff;border:1px solid var(--line);
+  border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+.rule-body{padding:12px 15px 14px}
 .duty-sum[hidden]{display:none}
 .ds-head{padding:11px 16px;background:linear-gradient(180deg,#eef6fc 0%,#d3e6f6 100%);
   border-bottom:1px solid var(--line);color:#1c4c6d;font-size:19px;font-weight:900}
@@ -384,9 +385,9 @@ tr.d-none.alt .row-label{background:#d5e4f1}
 
   <div class="duty-sum" id="dutySum" hidden></div>
 
-  <details class="fold stage" id="stage2b">
-    <summary>第二階段：職司規劃說明<span class="s-note">交接規則</span></summary>
-    <div class="fold-body">
+  <section class="rule-box">
+    <div class="ds-head">第二階段：職司規劃說明</div>
+    <div class="rule-body">
       <div class="rows">
         <div class="r"><span class="d">🍳 烹飪</span>
           <span>主要烹飪要<b>前一天晚上</b>先到，與頭手交接，並確認<b>隔天早上人力是否足夠</b>。<em>職司完整不空窗：前一天晚上 → 當天</em></span></div>
@@ -396,7 +397,7 @@ tr.d-none.alt .row-label{background:#d5e4f1}
           <span>沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
       </div>
     </div>
-  </details>
+  </section>
 
   <div class="footer">每 30 秒自動同步 Google 試算表；內容有變更才更新。｜已採大字、高對比版面。</div>
 </main>
