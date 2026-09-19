@@ -163,50 +163,6 @@ details.fold.stage>summary .s-note{margin-left:10px;font-size:14.5px;font-weight
 .fold-body.flush .shell{border:0;border-radius:0;box-shadow:none}
 .fold-body.flush .notes-box{margin:0;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none}
 
-/* 職司分配（拖拉） */
-.a-sub{font-size:15.5px;line-height:1.7;color:#3f5262;margin-bottom:10px}
-.a-group{border:1px solid var(--line);border-radius:11px;margin-bottom:9px;overflow:hidden}
-.a-head{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:18px;font-weight:900;
-  border-bottom:1px solid var(--line)}
-.a-head .n{margin-left:auto;font-size:14px;color:#5c7183}
-.a-g-cook .a-head{background:#f4dcbd;color:#6b4416}
-.a-g-clean .a-head{background:#cfe0f2;color:#1c4c6d}
-.a-g-guard .a-head{background:#d8e8d6;color:#2b5730}
-.a-g-none .a-head{background:#e9edf1;color:#4b5b68}
-.a-rows{min-height:46px;padding:5px;background:#fff}
-.a-rows.over{background:var(--brand-soft)}
-.a-hint{padding:10px 6px;text-align:center;color:#9fb2c1;font-size:14.5px}
-.a-row{display:flex;align-items:center;gap:8px;padding:8px 9px;margin:3px 0;background:#fff;
-  border:1px solid var(--line);border-radius:9px;touch-action:none;user-select:none;cursor:grab}
-.a-row.drag{position:fixed;z-index:150;box-shadow:0 12px 28px rgba(16,48,74,.3);opacity:.96;
-  pointer-events:none;cursor:grabbing}
-.a-ph{margin:3px 0;border:2px dashed var(--brand);border-radius:9px;background:var(--brand-soft)}
-.a-grip{flex:0 0 auto;color:#9fb2c1;font-size:17px;line-height:1;letter-spacing:-2px}
-.a-nm{font-size:18px;font-weight:900;white-space:nowrap}
-.a-qk{display:flex;gap:3px;flex:0 0 auto;margin-left:auto}
-.a-qk button{appearance:none;border:1px solid var(--line);background:#fff;color:#5a6c7a;font:inherit;
-  font-size:13px;font-weight:900;padding:4px 7px;border-radius:7px;cursor:pointer}
-.a-qk button:hover{background:var(--brand-soft);color:var(--brand-dark)}
-.a-qk button.on{background:var(--brand-dark);color:#fff;border-color:var(--brand-dark)}
-.a-days{display:flex;flex-wrap:wrap;gap:3px;width:100%;order:9}
-.a-d{font-size:12px;font-weight:900;color:#43606f;background:#eef4f9;border:1px solid #d8e6f0;
-  border-radius:6px;padding:1px 5px;white-space:nowrap}
-.a-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
-.a-btn{appearance:none;border:1px solid var(--brand-dark);background:#fff;color:var(--brand-dark);
-  font:inherit;font-weight:900;font-size:15.5px;padding:8px 15px;border-radius:9px;cursor:pointer}
-.a-btn.main{background:var(--brand-dark);color:#fff}
-.a-msg{font-size:14.5px;font-weight:900;color:var(--muted);line-height:1.5}
-.a-msg.ok{color:#1d6b45}
-.a-msg.err{color:#8f3f34}
-.a-out{width:100%;height:110px;margin-top:8px;padding:8px;border:1px solid var(--line);
-  border-radius:9px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.5}
-
-/* 第二階段裡面的子折疊：比外層低一階 */
-details.fold.sub{margin-top:12px;box-shadow:none;border-color:#d7e4ef}
-details.fold.sub>summary{font-size:17px;padding:10px 13px;
-  background:linear-gradient(180deg,#f4f9fd 0%,#e6f0f9 100%)}
-details.fold.stage>.fold-body>.duty-sum{margin-top:0}
-
 /* 折疊區：職司說明 */
 .folds{display:grid;grid-template-columns:1fr;gap:10px;align-items:start;margin:12px 0 4px}
 details.fold{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
@@ -426,44 +382,19 @@ tr.d-none.alt .row-label{background:#d5e4f1}
     </div>
   </details>
 
-  <details class="fold stage" id="stage2" open>
-    <summary>第二階段：職司安排<span class="s-note">誰做什麼</span></summary>
+  <div class="duty-sum" id="dutySum" hidden></div>
+
+  <details class="fold stage" id="stage2b">
+    <summary>第二階段：職司規劃說明<span class="s-note">交接規則</span></summary>
     <div class="fold-body">
-
-      <div class="duty-sum" id="dutySum" hidden></div>
-
-      <details class="fold sub" id="assignFold" hidden>
-        <summary>職司分配<span class="s-note">排班用</span></summary>
-        <div class="fold-body">
-          <div class="a-sub">上下拖名字換組，或按右邊的 <b>烹</b>／<b>清</b>／<b>維</b> 直接指定，
-            一次就把那個人<b>所有排到的日期</b>都改好。改完按「複製表格」，
-            回 Google 試算表的<b>職司分頁</b>貼上。
-            <br><b>在這裡拖不會改到大家看到的班表</b>——要貼回試算表才算數，
-            拖錯了按「重來」或重新整理就回到原狀。</div>
-          <div id="aGroups"></div>
-          <div class="a-bar">
-            <button class="a-btn main" id="aCopy" type="button">複製表格</button>
-            <button class="a-btn" id="aReset" type="button">重來</button>
-            <span class="a-msg" id="aMsg"></span>
-          </div>
-          <textarea class="a-out" id="aOut" readonly placeholder="按「複製表格」後，要貼回試算表的內容會出現在這裡"></textarea>
-        </div>
-      </details>
-
-      <details class="fold sub">
-        <summary>職司規劃說明</summary>
-        <div class="fold-body">
-          <div class="rows">
-            <div class="r"><span class="d">🍳 烹飪</span>
-              <span>主要烹飪要<b>前一天晚上</b>先到，與頭手交接，並確認<b>隔天早上人力是否足夠</b>。<em>職司完整不空窗：前一天晚上 → 當天</em></span></div>
-            <div class="r"><span class="d">🛡️ 維安</span>
-              <span>要<b>睡一晚</b>，隔天執完早香、完成交接後才離開。<em>職司完整不空窗：當天 → 隔天早香後</em></span></div>
-            <div class="r"><span class="d">🧹 清潔</span>
-              <span>沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
-          </div>
-        </div>
-      </details>
-
+      <div class="rows">
+        <div class="r"><span class="d">🍳 烹飪</span>
+          <span>主要烹飪要<b>前一天晚上</b>先到，與頭手交接，並確認<b>隔天早上人力是否足夠</b>。<em>職司完整不空窗：前一天晚上 → 當天</em></span></div>
+        <div class="r"><span class="d">🛡️ 維安</span>
+          <span>要<b>睡一晚</b>，隔天執完早香、完成交接後才離開。<em>職司完整不空窗：當天 → 隔天早香後</em></span></div>
+        <div class="r"><span class="d">🧹 清潔</span>
+          <span>沒有跨日的交接規則。<em>職司完整不空窗：當天</em></span></div>
+      </div>
     </div>
   </details>
 
@@ -671,7 +602,7 @@ function splitMarks(raw){
       }
     });
   }
-  return {name:t.trim(),marks,raw:String(raw||'').trim()};
+  return {name:t.trim(),marks};
 }
 /* 職司 → 配色代號。認不得的就給中性色，不會壞掉 */
 function dutyKey(name){
@@ -781,7 +712,7 @@ function buildData(rows){
     if(last && last.duty===row.duty)last.rows.push(row);
     else blocks.push({duty:row.duty,rows:[row]});
   });
-  return {days,grid,blocks,hasDuty,pasteAt:bodyStart+1,today:todayIso()};
+  return {days,grid,blocks,hasDuty,today:todayIso()};
 }
 
 /* ---------- 畫面 ---------- */
@@ -791,7 +722,6 @@ function render(data,duty){
   $('content').innerHTML=buildTable(data);
   buildLegend(data,duty);
   buildDutyTable(duty);
-  buildAssign(duty);
   buildNotes(data);
   updateScrollHint();
 }
@@ -1060,7 +990,7 @@ function buildDutyTable(data){
         `<th class="row-label">${esc(row.no||String(ri+1))}</th>${tds}</tr>`;
     });
   });
-  box.innerHTML='<div class="ds-head">職司表</div>'+
+  box.innerHTML='<div class="ds-head">第二階段：職司表</div>'+
     '<div class="ds-scroll"><table class="has-duty">'+
     '<thead><tr class="date-row"><th class="corner" colspan="2">日期</th>'+dateHtml+'</tr>'+
     '<tr class="count-row"><th class="corner" colspan="2">人數</th>'+cntHtml+'</tr></thead>'+
@@ -1189,162 +1119,6 @@ function closePop(){
   delete pop.dataset.open;
   delete pop.dataset.key;
 }
-
-/* ---------- 職司分配（拖拉）----------
-   資料就用已經讀進來的職司分頁，不另外再查一次。
-   網頁是唯讀的，所以改完是「複製 → 貼回試算表」。 */
-const A_DUTIES=[
-  {name:'烹飪',key:'cook'},{name:'清潔',key:'clean'},
-  {name:'維安',key:'guard'},{name:'',key:'none',label:'未分配'}
-];
-let aPeople=[], aDays=[], aPasteAt=5, aDirty=false;
-
-function buildAssign(duty){
-  const fold=$('assignFold');
-  if(!fold)return;
-  if(!duty || !duty.hasDuty){ fold.hidden=true; return; }
-  fold.hidden=false;
-  if(aDirty)return;              // 排到一半就不要被自動更新洗掉
-  aDays=duty.days.map(d=>String(d.dateText||'').split(/\r?\n/)[0].trim());
-  aPasteAt=duty.pasteAt||5;
-  const map=new Map();
-  (duty.grid||[]).forEach(row=>{
-    row.cells.forEach((c,k)=>{
-      if(!c.name)return;
-      // 記號要**逐日**留著：同一個人可能只有某一天是獻供人員
-      if(!map.has(c.name))map.set(c.name,{name:c.name,marks:c.marks,raws:{},days:[],duty:row.duty||''});
-      const p=map.get(c.name);
-      if(p.days.indexOf(k)<0)p.days.push(k);
-      p.raws[k]=c.raw||c.name;
-      if(!p.duty)p.duty=row.duty||'';
-      if((c.marks||[]).length>(p.marks||[]).length)p.marks=c.marks;
-    });
-  });
-  aPeople=[...map.values()];
-  aPeople.forEach(p=>{ if(!A_DUTIES.some(d=>d.name===p.duty))p.duty=''; });
-  renderAssign();
-}
-function renderAssign(){
-  const box=$('aGroups');
-  if(!box)return;
-  box.innerHTML=A_DUTIES.map(d=>{
-    const list=aPeople.filter(p=>p.duty===d.name);
-    return `<section class="a-group a-g-${d.key}">
-      <div class="a-head"><span>${esc(d.label||d.name)}</span><span class="n">${list.length} 人</span></div>
-      <div class="a-rows" data-duty="${esc(d.name)}">${
-        list.map(p=>`<div class="a-row" data-name="${esc(p.name)}">
-          <span class="a-grip">⣿</span>
-          <span class="a-nm">${(p.marks||[]).map(m=>
-            `<span class="mk mk-${m.key}">${esc(m.ico)}</span>`).join('')}${esc(p.name)}</span>
-          <span class="a-qk">${A_DUTIES.filter(x=>x.name).map(x=>
-            `<button type="button" data-to="${esc(x.name)}" class="${p.duty===x.name?'on':''}">${esc(x.name[0])}</button>`).join('')}</span>
-          <span class="a-days">${p.days.map(i=>`<span class="a-d">${esc(aDays[i]||'')}</span>`).join('')}</span>
-        </div>`).join('')||'<div class="a-hint">把名字拖到這裡</div>'}</div>
-    </section>`;
-  }).join('');
-}
-/* 小按鈕直接指定 */
-$('aGroups').addEventListener('click',e=>{
-  const b=e.target.closest('.a-qk button'); if(!b)return;
-  const p=aPeople.find(x=>x.name===b.closest('.a-row').dataset.name); if(!p)return;
-  p.duty=(p.duty===b.dataset.to)?'':b.dataset.to;
-  aDirty=true; renderAssign();
-});
-/* 上下拖 */
-let aDrag=null, aScroll=0, aScrollRaf=0;
-/* 名單長的時候，拖到畫面上下緣會自動捲動，不然手機上根本拖不到下面那一組 */
-function aAutoScroll(){
-  if(!aDrag){aScrollRaf=0;return;}
-  if(aScroll)window.scrollBy(0,aScroll);
-  aScrollRaf=requestAnimationFrame(aAutoScroll);
-}
-$('aGroups').addEventListener('pointerdown',e=>{
-  if(e.target.closest('.a-qk'))return;
-  const row=e.target.closest('.a-row'); if(!row)return;
-  e.preventDefault();
-  const r=row.getBoundingClientRect();
-  const ph=document.createElement('div');
-  ph.className='a-ph'; ph.style.height=r.height+'px';
-  row.parentNode.insertBefore(ph,row);
-  row.classList.add('drag');
-  row.style.width=r.width+'px'; row.style.left=r.left+'px'; row.style.top=r.top+'px';
-  aDrag={row,ph,dx:e.clientX-r.left,dy:e.clientY-r.top};
-  row.setPointerCapture(e.pointerId);
-  if(!aScrollRaf)aScrollRaf=requestAnimationFrame(aAutoScroll);
-});
-$('aGroups').addEventListener('pointermove',e=>{
-  if(!aDrag)return;
-  aDrag.row.style.left=(e.clientX-aDrag.dx)+'px';
-  aDrag.row.style.top=(e.clientY-aDrag.dy)+'px';
-  const EDGE=110;
-  aScroll = e.clientY<EDGE ? -Math.ceil((EDGE-e.clientY)/6)
-          : e.clientY>innerHeight-EDGE ? Math.ceil((e.clientY-(innerHeight-EDGE))/6) : 0;
-  const el=document.elementFromPoint(e.clientX,e.clientY);
-  if(!el)return;
-  document.querySelectorAll('.a-rows.over').forEach(x=>x.classList.remove('over'));
-  const g=el.closest('.a-group');
-  const box=el.closest('.a-rows')||(g?g.querySelector('.a-rows'):null);
-  if(!box)return;
-  box.classList.add('over');
-  const hint=box.querySelector('.a-hint'); if(hint)hint.remove();
-  let before=null;
-  for(const r of [...box.querySelectorAll('.a-row:not(.drag)')]){
-    const b=r.getBoundingClientRect();
-    if(e.clientY<b.top+b.height/2){before=r;break;}
-  }
-  box.insertBefore(aDrag.ph,before);
-});
-function aEnd(){
-  if(!aDrag)return;
-  const {row,ph}=aDrag;
-  row.classList.remove('drag'); row.style.cssText='';
-  ph.parentNode.insertBefore(row,ph); ph.remove();
-  document.querySelectorAll('.a-rows.over').forEach(x=>x.classList.remove('over'));
-  aDrag=null; aScroll=0;
-  if(aScrollRaf){cancelAnimationFrame(aScrollRaf);aScrollRaf=0;}
-  const out=[];
-  document.querySelectorAll('.a-rows').forEach(box=>{
-    box.querySelectorAll('.a-row').forEach(r=>{
-      const p=aPeople.find(x=>x.name===r.dataset.name);
-      if(p){p.duty=box.dataset.duty;out.push(p)}
-    });
-  });
-  if(out.length===aPeople.length)aPeople=out;
-  aDirty=true; renderAssign();
-}
-$('aGroups').addEventListener('pointerup',aEnd);
-$('aGroups').addEventListener('pointercancel',aEnd);
-
-$('aReset').addEventListener('click',()=>{
-  aDirty=false; buildAssign(currentDuty);
-  $('aMsg').textContent='已還原成試算表上的內容'; $('aMsg').className='a-msg';
-  $('aOut').value='';
-});
-$('aCopy').addEventListener('click',async()=>{
-  const lines=[];
-  A_DUTIES.forEach(d=>{
-    const label=d.label||d.name;
-    aPeople.filter(p=>p.duty===d.name).forEach((p,i)=>{
-      const cells=aDays.map((_,k)=>p.days.indexOf(k)>=0 ? (p.raws[k]||p.name) : '');
-      lines.push([i===0?label:'',String(i+1)].concat(cells).join('\t'));
-    });
-  });
-  const tsv=lines.join('\n'), m=$('aMsg');
-  $('aOut').value=tsv;
-  if(!lines.length){m.textContent='名單是空的。';m.className='a-msg err';return;}
-  const left=aPeople.filter(p=>!p.duty).length;
-  const tail=left?('　⚠ 還有 '+left+' 人未分配'):'';
-  try{
-    await navigator.clipboard.writeText(tsv);
-    m.textContent='已複製 '+lines.length+' 列 → 貼到職司分頁的 A'+aPasteAt+
-      '（會蓋到第 '+(aPasteAt+lines.length-1)+' 列）'+tail;
-    m.className='a-msg '+(left?'err':'ok');
-  }catch(err){
-    $('aOut').select();
-    m.textContent='瀏覽器擋住自動複製，請在下面框裡全選複製（共 '+lines.length+' 列）'+tail;
-    m.className='a-msg err';
-  }
-});
 
 /* ---------- 事件綁定 ---------- */
 document.addEventListener('click',e=>{     // 兩張表都要能點，所以綁在 document
